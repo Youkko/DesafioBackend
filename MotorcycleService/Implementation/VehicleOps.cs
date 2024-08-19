@@ -81,11 +81,11 @@ namespace DeliveryPersonService
         /// <exception cref="VINInUseException"></exception>
         public async Task<bool> EditVIN(VINEditionParams vinParams)
         {
-            if (string.IsNullOrEmpty(vinParams.ExistingVIN) || string.IsNullOrEmpty(vinParams.NewVIN))
+            if (string.IsNullOrEmpty(FilterString(vinParams.ExistingVIN)) || string.IsNullOrEmpty(FilterString(vinParams.NewVIN)))
                 throw new RequiredInformationMissingException();
 
-            var existingVIN = await _database.FindVehicleByVIN(vinParams.ExistingVIN);
-            var newVIN = await _database.FindVehicleByVIN(vinParams.NewVIN);
+            var existingVIN = await _database.FindVehicleByVIN(FilterString(vinParams.ExistingVIN)!);
+            var newVIN = await _database.FindVehicleByVIN(FilterString(vinParams.NewVIN)!);
 
             if (existingVIN == null)
                 throw new VehicleNotFoundException();

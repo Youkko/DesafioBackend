@@ -226,8 +226,8 @@ namespace MotorcycleRentalApi.Controllers
                 {
                     if (evtArgs.BasicProperties.CorrelationId == correlationID)
                     {
-                        var response = JsonSerializer.Deserialize<IEnumerable<Motorcycle>?>(
-                            Encoding.UTF8.GetString(evtArgs.Body.ToArray()));
+                        string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
+                        var response = JsonSerializer.Deserialize<bool>(respStr);
                         _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
                         tcs.SetResult(Ok(response));
                     }

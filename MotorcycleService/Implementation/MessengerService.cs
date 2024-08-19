@@ -201,12 +201,24 @@ namespace MotorcycleService
 
         private string EditVIN(ReadOnlyMemory<byte> body)
         {
-            string message = Encoding.UTF8.GetString(body.ToArray());
-            var editRequest = JsonConvert.DeserializeObject<VINEditionParams>(message);
-            if (editRequest == null)
-                throw new RequiredInformationMissingException();
-            var result = _vehicles.EditVIN(editRequest).Result;
-            return JS.JsonSerializer.Serialize(result);
+            try
+            {
+                string message = Encoding.UTF8.GetString(body.ToArray());
+                var editRequest = JsonConvert.DeserializeObject<VINEditionParams>(message);
+                if (editRequest == null)
+                    throw new RequiredInformationMissingException();
+                var result = _vehicles.EditVIN(editRequest).Result;
+                return JS.JsonSerializer.Serialize(result);
+            }
+            catch (AggregateException aEx)
+            {
+                aEx.Flatten().Handle(ex =>
+                {
+                    _logger.LogError(ex, ex.Message);
+                    return true;
+                });
+                return JS.JsonSerializer.Serialize(false);
+            }
         }
 
         private void Notify(ReadOnlyMemory<byte> body)

@@ -1,6 +1,7 @@
 ﻿using MotorcycleRental.Data;
 using MotorcycleRental.Models.DTO;
 using MotorcycleRental.Models.Errors;
+using System.Text.RegularExpressions;
 namespace DeliveryPersonService
 {
     public class VehicleOps : IVehicleOps
@@ -15,6 +16,15 @@ namespace DeliveryPersonService
             _database = database;
         }
 
+        public string? FilterString(string? input, bool toLower = false)
+        {
+            if (string.IsNullOrEmpty(input)) return null;
+            var pattern = @"[^A-Za-z0-9\-]";
+            string result = Regex.Replace(input, pattern, string.Empty);
+            if (input.ToLower() == "null") return null;
+            return toLower?result.ToLower():result;
+        }
+
         /// <summary>
         /// List all existing motorcycles in the system
         /// </summary>
@@ -23,11 +33,19 @@ namespace DeliveryPersonService
         public async Task<IEnumerable<Motorcycle>?> ListMotorcycles(string? VIN)
         {
             var motorcycles = await _database.ListVehicles();
-            return string.IsNullOrEmpty(VIN) ?
-                motorcycles :
-                motorcycles?
-                    .Where(m => m.VIN!.Contains(VIN, StringComparison.InvariantCultureIgnoreCase))
-                    .AsEnumerable();
+            if (motorcycles == null)
+            {
+                return null;
+            }
+            string? targetVIN = FilterString(VIN!);
+            if (!string.IsNullOrEmpty(targetVIN))
+            {
+                var filtered = motorcycles
+                    .Where(m => m.VIN != null &&
+                           m.VIN.Contains(targetVIN, StringComparison.InvariantCultureIgnoreCase));
+                return filtered;
+            }
+            return motorcycles;
         }
 
         /// <summary>
@@ -37,13 +55,13 @@ namespace DeliveryPersonService
         /// <returns>Motorcycle object || null</returns>
         public async Task<Motorcycle?> CreateVehicle(MotorcycleCreation vehicleData)
         {
-            if (string.IsNullOrEmpty(vehicleData.VIN) || 
-                string.IsNullOrEmpty(vehicleData.Model) ||
-                string.IsNullOrEmpty(vehicleData.Brand) ||
+            if (string.IsNullOrEmpty(FilterString(vehicleData.VIN)) || 
+                string.IsNullOrEmpty(FilterString(vehicleData.Model)) ||
+                string.IsNullOrEmpty(FilterString(vehicleData.Brand)) ||
                 !vehicleData.Year.HasValue)
                 throw new RequiredInformationMissingException();
 
-            var existingVIN = await _database.FindVehicleByVIN(vehicleData.VIN);
+            var existingVIN = await _database.FindVehicleByVIN(FilterString(vehicleData.VIN)!);
 
             if (existingVIN != null)
                 throw new VINInUseException();

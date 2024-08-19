@@ -45,7 +45,7 @@ namespace DeliveryPersonService
 
             var existingVIN = await _database.FindVehicleByVIN(vehicleData.VIN);
 
-            if (existingVIN == null)
+            if (existingVIN != null)
                 throw new VINInUseException();
 
             var newVehicle = await _database.CreateVehicle(vehicleData);

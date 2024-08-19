@@ -15,6 +15,8 @@ namespace MotorcycleRental.Data
             _connector = new EFConnector(new DatabaseContext(curOptions.ConnectionString!));
         }
 
+        public void Migrate() => _connector.Migrate();
+
         /// <summary>
         /// Authenticate an user
         /// </summary>

@@ -81,8 +81,8 @@ namespace MotorcycleRentalApi.Controllers
                     {
                         var response = JsonSerializer.Deserialize<IEnumerable<Motorcycle>?>(
                             Encoding.UTF8.GetString(evtArgs.Body.ToArray()));
-                        tcs.SetResult(Ok(response));
                         _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
+                        tcs.SetResult(Ok(response));
                     }
                     else
                     {
@@ -90,6 +90,11 @@ namespace MotorcycleRentalApi.Controllers
                     }
                 }
                 catch (RabbitMQOperationInterruptedException ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    tcs.SetResult(StatusCode(500, ex.Message));
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, ex.Message);
                     tcs.SetResult(StatusCode(500, ex.Message));
@@ -147,10 +152,10 @@ namespace MotorcycleRentalApi.Controllers
                 {
                     if (evtArgs.BasicProperties.CorrelationId == correlationID)
                     {
-                        var response = JsonSerializer.Deserialize<IEnumerable<Motorcycle>?>(
-                            Encoding.UTF8.GetString(evtArgs.Body.ToArray()));
-                        tcs.SetResult(Ok(response));
+                        string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
+                        var response = JsonSerializer.Deserialize<Motorcycle?>(respStr);
                         _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
+                        tcs.SetResult(Ok(response));
                     }
                     else
                     {
@@ -223,8 +228,8 @@ namespace MotorcycleRentalApi.Controllers
                     {
                         var response = JsonSerializer.Deserialize<IEnumerable<Motorcycle>?>(
                             Encoding.UTF8.GetString(evtArgs.Body.ToArray()));
-                        tcs.SetResult(Ok(response));
                         _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
+                        tcs.SetResult(Ok(response));
                     }
                     else
                     {
@@ -258,24 +263,5 @@ namespace MotorcycleRentalApi.Controllers
 
             return await tcs.Task;
         }
-
-        /*
-        [HttpGet()]
-        public async Task<IActionResult> Register()//[FromBody] UserRegisterDto userRegister)
-        {
-            //var user = new User
-            //{
-            //    Id = Guid.NewGuid(),
-            //    Name = userRegister.Name,
-            //    Email = userRegister.Email,
-            //    PhoneNumber = userRegister.PhoneNumber,
-            //    Password = HashPassword(userRegister.Password),
-            //    CreatedOn = DateTime.UtcNow
-            //};
-
-            //await _database.AddAsync(user);
-            return Ok();
-        }
-        */
     }
 }

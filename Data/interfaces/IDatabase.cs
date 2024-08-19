@@ -3,6 +3,7 @@ namespace MotorcycleRental.Data
 {
     public interface IDatabase
     {
+        void Migrate();
         /// <summary>
         /// Authenticate an user
         /// </summary>

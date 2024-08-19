@@ -4,6 +4,7 @@ namespace MotorcycleRental.Data
 {
     public interface IConnector
     {
+        void Migrate();
         Task<T> AddAsync<T>(T entity) where T : class;
         Task<T?> GetByIdAsync<T>(Guid id) where T : class;
         Task<IEnumerable<T>> GetAllAsync<T>() where T : class;

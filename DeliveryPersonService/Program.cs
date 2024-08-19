@@ -2,6 +2,7 @@ using DatabaseConfig = MotorcycleRental.Models.Database.DatabaseConfig;
 using DeliveryPersonService;
 using MotorcycleRental.Data;
 using MotorcycleRental.Models;
+using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("MotorcycleRentalDatabase");
@@ -19,4 +20,12 @@ builder.Services.Configure<RabbitMQSettings>(options =>
 builder.Services.AddHostedService<MessengerService>();
 
 var host = builder.Build();
+
+// Trigger database migration
+using (var scope = host.Services.CreateScope())
+{
+    var database = scope.ServiceProvider.GetRequiredService<IDatabase>();
+    database.Migrate();
+}
+
 host.Run();

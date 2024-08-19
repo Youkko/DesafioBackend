@@ -24,6 +24,8 @@ namespace MotorcycleRental.Data
         private DbSet<DB.CNHType>? CNHTypes => _context.CNHType;
         private DbSet<DB.Notification>? Notifications => _context.Notification;
 
+        public void Migrate() => _context.Database.Migrate();
+
         public async Task<T> AddAsync<T>(T entity) where T : class
         {
             await _context.Set<T>().AddAsync(entity);
@@ -87,8 +89,9 @@ namespace MotorcycleRental.Data
 
             var users = await GetAllAsync<DB.User>();
 
-            var user = users.FirstOrDefault(u => u.Email != null &&
-                                                 u.Email.Equals(userLogin.Email, StringComparison.InvariantCultureIgnoreCase));
+            var user = users.FirstOrDefault(u => !string.IsNullOrEmpty(u.Email) &&
+                                                 !string.IsNullOrEmpty(userLogin.Email) &&
+                                                 u.Email.ToLower() == userLogin.Email.ToLower());
             return
                 user != null ?
                     PasswordHelper.VerifyPassword(userLogin.Password!, user.Password!) ?
@@ -126,7 +129,8 @@ namespace MotorcycleRental.Data
         public async Task<DTO.Motorcycle?> FindVehicleByVIN(string VIN)
         {
             var vehicle = await Motorcycles!
-                .FirstOrDefaultAsync(m => m.VIN!.Equals(VIN, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefaultAsync(m => m.VIN != null &&
+                                          m.VIN.ToLower() == VIN.ToLower());
             
             return vehicle != null ? new DTO.Motorcycle(vehicle) : null;
         }
@@ -139,7 +143,9 @@ namespace MotorcycleRental.Data
         public async Task<bool> ReplaceVIN(DTO.VINEditionParams vinParams)
         {
             var vehicle = await Motorcycles!
-                .Where(m => m.VIN!.Equals(vinParams.ExistingVIN, StringComparison.InvariantCultureIgnoreCase))
+                .Where(m => !string.IsNullOrEmpty(m.VIN) &&
+                            !string.IsNullOrEmpty(vinParams.ExistingVIN) &&
+                            m.VIN.ToLower() == vinParams.ExistingVIN.ToLower())
                 .FirstOrDefaultAsync();
 
             if (vehicle != null)
@@ -177,7 +183,7 @@ namespace MotorcycleRental.Data
         /// <param name="message">The message to add to database</param>
         public async void Notify(string message)
         {
-            await Notifications!.AddAsync(new DB.Notification() { Message = message });
+            await Notifications!.AddAsync(new() { Message = message });
             await _context.SaveChangesAsync();
         }
 

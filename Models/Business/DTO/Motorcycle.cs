@@ -8,6 +8,8 @@
         public string? Brand { get; set; }
 
         //public ICollection<Rental>? Rentals { get; set; }
+        public Motorcycle() { }
+
         public Motorcycle(Database.Motorcycle motorcycle)
         {
             Id = motorcycle.Id;

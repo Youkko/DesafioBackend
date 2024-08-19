@@ -141,11 +141,24 @@ namespace MotorcycleService
 
         private string CreateMotorcycle(ReadOnlyMemory<byte> body)
         {
+            Motorcycle? result = null;
             string message = Encoding.UTF8.GetString(body.ToArray());
             var creationRequest = JsonConvert.DeserializeObject<MotorcycleCreation>(message);
             if (creationRequest == null)
                 throw new RequiredInformationMissingException();
-            var result = _vehicles.CreateVehicle(creationRequest).Result;
+            try
+            {
+                result = _vehicles.CreateVehicle(creationRequest).Result;
+
+            }
+            catch (AggregateException aEx)
+            {
+                aEx.Flatten().Handle(ex =>
+                {
+                    _logger.LogError(ex, ex.Message);
+                    throw ex;
+                });
+            }
 
             if (result != null)
             {
@@ -171,6 +184,14 @@ namespace MotorcycleService
                     {
                         _logger.LogError(ex, ex.Message);
                         throw;
+                    }
+                    catch (AggregateException aEx)
+                    {
+                        aEx.Flatten().Handle(ex =>
+                        {
+                            _logger.LogError(ex, ex.Message);
+                            throw ex;
+                        });
                     }
                 }
             }

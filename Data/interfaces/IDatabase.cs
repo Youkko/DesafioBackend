@@ -33,5 +33,10 @@ namespace MotorcycleRental.Data
         /// <param name="vehicleData">Vehicle details</param>
         /// <returns>Motorcycle object || null</returns>
         Task<Motorcycle?> CreateVehicle(MotorcycleCreation vehicleData);
+        /// <summary>
+        /// Add a notification to database
+        /// </summary>
+        /// <param name="message">The message to add to database</param>
+        void Notify(string message);
     }
 }

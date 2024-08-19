@@ -1,0 +1,428 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Work\\desafio-backend\\DesafioBackend\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5D50EC82-487E-4D82-8DC5-A761BAA361B9}|MotorcycleService\\MotorcycleService.csproj|c:\\work\\desafio-backend\\desafiobackend\\motorcycleservice\\implementation\\messengerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D50EC82-487E-4D82-8DC5-A761BAA361B9}|MotorcycleService\\MotorcycleService.csproj|solutionrelative:motorcycleservice\\implementation\\messengerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|c:\\work\\desafio-backend\\desafiobackend\\models\\business\\messaging\\queues.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|solutionrelative:models\\business\\messaging\\queues.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|c:\\work\\desafio-backend\\desafiobackend\\data\\implementation\\databasecontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|solutionrelative:data\\implementation\\databasecontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|c:\\work\\desafio-backend\\desafiobackend\\data\\implementation\\databasecontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|solutionrelative:data\\implementation\\databasecontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|c:\\work\\desafio-backend\\desafiobackend\\data\\interfaces\\idatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|solutionrelative:data\\interfaces\\idatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|c:\\work\\desafio-backend\\desafiobackend\\data\\implementation\\database.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|solutionrelative:data\\implementation\\database.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|c:\\work\\desafio-backend\\desafiobackend\\data\\implementation\\efconnector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|solutionrelative:data\\implementation\\efconnector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|c:\\work\\desafio-backend\\desafiobackend\\data\\interfaces\\iconnector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FAD88EC-56B4-4C5F-9E56-9B68D5E61706}|Data\\Data.csproj|solutionrelative:data\\interfaces\\iconnector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E73686C4-5422-4111-B67F-744BA54E5B0B}|MotorcycleRentalApi\\MotorcycleRentalApi.csproj|c:\\work\\desafio-backend\\desafiobackend\\motorcyclerentalapi\\controllers\\vehiclescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E73686C4-5422-4111-B67F-744BA54E5B0B}|MotorcycleRentalApi\\MotorcycleRentalApi.csproj|solutionrelative:motorcyclerentalapi\\controllers\\vehiclescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|c:\\work\\desafio-backend\\desafiobackend\\models\\database\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|solutionrelative:models\\database\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|c:\\work\\desafio-backend\\desafiobackend\\models\\business\\dto\\vineditionparams.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|solutionrelative:models\\business\\dto\\vineditionparams.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D50EC82-487E-4D82-8DC5-A761BAA361B9}|MotorcycleService\\MotorcycleService.csproj|c:\\work\\desafio-backend\\desafiobackend\\motorcycleservice\\implementation\\vehicleops.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D50EC82-487E-4D82-8DC5-A761BAA361B9}|MotorcycleService\\MotorcycleService.csproj|solutionrelative:motorcycleservice\\implementation\\vehicleops.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D50EC82-487E-4D82-8DC5-A761BAA361B9}|MotorcycleService\\MotorcycleService.csproj|c:\\work\\desafio-backend\\desafiobackend\\motorcycleservice\\interfaces\\ivehicleops.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D50EC82-487E-4D82-8DC5-A761BAA361B9}|MotorcycleService\\MotorcycleService.csproj|solutionrelative:motorcycleservice\\interfaces\\ivehicleops.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|c:\\work\\desafio-backend\\desafiobackend\\models\\business\\dto\\motorcyclecreation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|solutionrelative:models\\business\\dto\\motorcyclecreation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|c:\\work\\desafio-backend\\desafiobackend\\models\\business\\dto\\motorcycle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|solutionrelative:models\\business\\dto\\motorcycle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5D50EC82-487E-4D82-8DC5-A761BAA361B9}|MotorcycleService\\MotorcycleService.csproj|c:\\work\\desafio-backend\\desafiobackend\\motorcycleservice\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5D50EC82-487E-4D82-8DC5-A761BAA361B9}|MotorcycleService\\MotorcycleService.csproj|solutionrelative:motorcycleservice\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28F424D0-FA59-4FAA-8E67-F1BDFEDD1F12}|DeliveryPersonService\\DeliveryPersonService.csproj|c:\\work\\desafio-backend\\desafiobackend\\deliverypersonservice\\implementation\\messengerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28F424D0-FA59-4FAA-8E67-F1BDFEDD1F12}|DeliveryPersonService\\DeliveryPersonService.csproj|solutionrelative:deliverypersonservice\\implementation\\messengerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28F424D0-FA59-4FAA-8E67-F1BDFEDD1F12}|DeliveryPersonService\\DeliveryPersonService.csproj|c:\\work\\desafio-backend\\desafiobackend\\deliverypersonservice\\implementation\\authentication.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28F424D0-FA59-4FAA-8E67-F1BDFEDD1F12}|DeliveryPersonService\\DeliveryPersonService.csproj|solutionrelative:deliverypersonservice\\implementation\\authentication.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E73686C4-5422-4111-B67F-744BA54E5B0B}|MotorcycleRentalApi\\MotorcycleRentalApi.csproj|c:\\work\\desafio-backend\\desafiobackend\\motorcyclerentalapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E73686C4-5422-4111-B67F-744BA54E5B0B}|MotorcycleRentalApi\\MotorcycleRentalApi.csproj|solutionrelative:motorcyclerentalapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|c:\\work\\desafio-backend\\desafiobackend\\models\\business\\errors\\vininuseexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|solutionrelative:models\\business\\errors\\vininuseexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E73686C4-5422-4111-B67F-744BA54E5B0B}|MotorcycleRentalApi\\MotorcycleRentalApi.csproj|c:\\work\\desafio-backend\\desafiobackend\\motorcyclerentalapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E73686C4-5422-4111-B67F-744BA54E5B0B}|MotorcycleRentalApi\\MotorcycleRentalApi.csproj|solutionrelative:motorcyclerentalapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28F424D0-FA59-4FAA-8E67-F1BDFEDD1F12}|DeliveryPersonService\\DeliveryPersonService.csproj|c:\\work\\desafio-backend\\desafiobackend\\deliverypersonservice\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28F424D0-FA59-4FAA-8E67-F1BDFEDD1F12}|DeliveryPersonService\\DeliveryPersonService.csproj|solutionrelative:deliverypersonservice\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8053ACD7-373E-4D96-A92B-B7BBD54F0F14}|OrderManagementService\\OrderManagementService.csproj|c:\\work\\desafio-backend\\desafiobackend\\ordermanagementservice\\implementation\\messengerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8053ACD7-373E-4D96-A92B-B7BBD54F0F14}|OrderManagementService\\OrderManagementService.csproj|solutionrelative:ordermanagementservice\\implementation\\messengerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|c:\\work\\desafio-backend\\desafiobackend\\models\\business\\errors\\rabbitmqoperationinterruptedexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0DAEFE5C-0A0A-44DC-BF7C-895684355F5B}|Models\\Models.csproj|solutionrelative:models\\business\\errors\\rabbitmqoperationinterruptedexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DatabaseContextFactory.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\implementation\\DatabaseContextFactory.cs",
+              "RelativeDocumentMoniker": "Data\\implementation\\DatabaseContextFactory.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\implementation\\DatabaseContextFactory.cs",
+              "RelativeToolTip": "Data\\implementation\\DatabaseContextFactory.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T05:51:52.454Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "IDatabase.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\interfaces\\IDatabase.cs",
+              "RelativeDocumentMoniker": "Data\\interfaces\\IDatabase.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\interfaces\\IDatabase.cs",
+              "RelativeToolTip": "Data\\interfaces\\IDatabase.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T00:19:41.935Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DatabaseContext.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\implementation\\DatabaseContext.cs",
+              "RelativeDocumentMoniker": "Data\\implementation\\DatabaseContext.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\implementation\\DatabaseContext.cs",
+              "RelativeToolTip": "Data\\implementation\\DatabaseContext.cs",
+              "ViewState": "AQIAAAAAAAAAMDMzMzPbvxMAAAA2AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T05:44:12.27Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MessengerService.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleService\\Implementation\\MessengerService.cs",
+              "RelativeDocumentMoniker": "MotorcycleService\\Implementation\\MessengerService.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleService\\Implementation\\MessengerService.cs",
+              "RelativeToolTip": "MotorcycleService\\Implementation\\MessengerService.cs",
+              "ViewState": "AQIAACMAAAAAAAAAAAAwwEcAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-18T23:37:40.919Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Queues.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\Messaging\\Queues.cs",
+              "RelativeDocumentMoniker": "Models\\Business\\Messaging\\Queues.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\Messaging\\Queues.cs",
+              "RelativeToolTip": "Models\\Business\\Messaging\\Queues.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-18T23:52:11.022Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Database.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\implementation\\Database.cs",
+              "RelativeDocumentMoniker": "Data\\implementation\\Database.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\implementation\\Database.cs",
+              "RelativeToolTip": "Data\\implementation\\Database.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAfAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T00:00:45.324Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "EFConnector.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\implementation\\EFConnector.cs",
+              "RelativeDocumentMoniker": "Data\\implementation\\EFConnector.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\implementation\\EFConnector.cs",
+              "RelativeToolTip": "Data\\implementation\\EFConnector.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T00:09:55.053Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "IConnector.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\interfaces\\IConnector.cs",
+              "RelativeDocumentMoniker": "Data\\interfaces\\IConnector.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Data\\interfaces\\IConnector.cs",
+              "RelativeToolTip": "Data\\interfaces\\IConnector.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T00:00:41.202Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "VehiclesController.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleRentalApi\\Controllers\\VehiclesController.cs",
+              "RelativeDocumentMoniker": "MotorcycleRentalApi\\Controllers\\VehiclesController.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleRentalApi\\Controllers\\VehiclesController.cs",
+              "RelativeToolTip": "MotorcycleRentalApi\\Controllers\\VehiclesController.cs",
+              "ViewState": "AQIAAF8AAAAAAAAAAAAAAHsAAAA6AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-18T23:39:50.233Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Notification.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Database\\Notification.cs",
+              "RelativeDocumentMoniker": "Models\\Database\\Notification.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Database\\Notification.cs",
+              "RelativeToolTip": "Models\\Database\\Notification.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T05:42:10.999Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "VINEditionParams.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\DTO\\VINEditionParams.cs",
+              "RelativeDocumentMoniker": "Models\\Business\\DTO\\VINEditionParams.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\DTO\\VINEditionParams.cs",
+              "RelativeToolTip": "Models\\Business\\DTO\\VINEditionParams.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAqwAQAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T03:34:22.028Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "IVehicleOps.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleService\\interfaces\\IVehicleOps.cs",
+              "RelativeDocumentMoniker": "MotorcycleService\\interfaces\\IVehicleOps.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleService\\interfaces\\IVehicleOps.cs",
+              "RelativeToolTip": "MotorcycleService\\interfaces\\IVehicleOps.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T01:50:23.832Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "VehicleOps.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleService\\Implementation\\VehicleOps.cs",
+              "RelativeDocumentMoniker": "MotorcycleService\\Implementation\\VehicleOps.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleService\\Implementation\\VehicleOps.cs",
+              "RelativeToolTip": "MotorcycleService\\Implementation\\VehicleOps.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAADQAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T01:49:19.312Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "MotorcycleCreation.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\DTO\\MotorcycleCreation.cs",
+              "RelativeDocumentMoniker": "Models\\Business\\DTO\\MotorcycleCreation.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\DTO\\MotorcycleCreation.cs",
+              "RelativeToolTip": "Models\\Business\\DTO\\MotorcycleCreation.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAAjAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T05:03:59.218Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Motorcycle.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\DTO\\Motorcycle.cs",
+              "RelativeDocumentMoniker": "Models\\Business\\DTO\\Motorcycle.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\DTO\\Motorcycle.cs",
+              "RelativeToolTip": "Models\\Business\\DTO\\Motorcycle.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T00:01:54.048Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleService\\Program.cs",
+              "RelativeDocumentMoniker": "MotorcycleService\\Program.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleService\\Program.cs",
+              "RelativeToolTip": "MotorcycleService\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T01:54:03.047Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "MessengerService.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\DeliveryPersonService\\Implementation\\MessengerService.cs",
+              "RelativeDocumentMoniker": "DeliveryPersonService\\Implementation\\MessengerService.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\DeliveryPersonService\\Implementation\\MessengerService.cs",
+              "RelativeToolTip": "DeliveryPersonService\\Implementation\\MessengerService.cs",
+              "ViewState": "AQIAACgAAAAAAAAAAAAgwE0AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-18T23:39:07.435Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "Authentication.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\DeliveryPersonService\\Implementation\\Authentication.cs",
+              "RelativeDocumentMoniker": "DeliveryPersonService\\Implementation\\Authentication.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\DeliveryPersonService\\Implementation\\Authentication.cs",
+              "RelativeToolTip": "DeliveryPersonService\\Implementation\\Authentication.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T04:46:22.813Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleRentalApi\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "MotorcycleRentalApi\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleRentalApi\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "MotorcycleRentalApi\\Controllers\\AuthController.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAAEUAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-15T20:07:22.396Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "VINInUseException.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\Errors\\VINInUseException.cs",
+              "RelativeDocumentMoniker": "Models\\Business\\Errors\\VINInUseException.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\Errors\\VINInUseException.cs",
+              "RelativeToolTip": "Models\\Business\\Errors\\VINInUseException.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T04:10:42.389Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleRentalApi\\Program.cs",
+              "RelativeDocumentMoniker": "MotorcycleRentalApi\\Program.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\MotorcycleRentalApi\\Program.cs",
+              "RelativeToolTip": "MotorcycleRentalApi\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T03:28:51.257Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\DeliveryPersonService\\Program.cs",
+              "RelativeDocumentMoniker": "DeliveryPersonService\\Program.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\DeliveryPersonService\\Program.cs",
+              "RelativeToolTip": "DeliveryPersonService\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABUAAAALAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-19T01:54:11.575Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "MessengerService.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\OrderManagementService\\Implementation\\MessengerService.cs",
+              "RelativeDocumentMoniker": "OrderManagementService\\Implementation\\MessengerService.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\OrderManagementService\\Implementation\\MessengerService.cs",
+              "RelativeToolTip": "OrderManagementService\\Implementation\\MessengerService.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-18T23:38:45.623Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "RabbitMQOperationInterruptedException.cs",
+              "DocumentMoniker": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\Errors\\RabbitMQOperationInterruptedException.cs",
+              "RelativeDocumentMoniker": "Models\\Business\\Errors\\RabbitMQOperationInterruptedException.cs",
+              "ToolTip": "C:\\Work\\desafio-backend\\DesafioBackend\\Models\\Business\\Errors\\RabbitMQOperationInterruptedException.cs",
+              "RelativeToolTip": "Models\\Business\\Errors\\RabbitMQOperationInterruptedException.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAARAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-18T21:41:08.28Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

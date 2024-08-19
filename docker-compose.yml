@@ -1,0 +1,100 @@
+services:
+  postgresql:
+    container_name: pgcontainer
+    image: postgres:13
+    environment:
+      POSTGRES_USER: rentalapp
+      POSTGRES_PASSWORD: R3n7-@-m07t0!
+      POSTGRES_DB: rental
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: "rentalapp"
+      RABBITMQ_DEFAULT_PASS: "m07t0-R3n7@L!"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: always
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  mrs:
+    image: ${DOCKER_REGISTRY-}mrs
+    build:
+      context: .
+      dockerfile: MotorcycleService/Dockerfile
+    depends_on:
+      postgresql:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rentalapp
+      RABBITMQ_PASS: m07t0-R3n7@L!
+    ports:
+      - 5000:81
+  
+  dps:
+    image: ${DOCKER_REGISTRY-}dps
+    build:
+      context: .
+      dockerfile: DeliveryPersonService/Dockerfile
+    depends_on:
+      postgresql:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rentalapp
+      RABBITMQ_PASS: m07t0-R3n7@L!
+    ports:
+      - 5001:82
+  
+  oms:
+    image: ${DOCKER_REGISTRY-}oms
+    build:
+      context: .
+      dockerfile: OrderManagementService/Dockerfile
+    depends_on:
+      postgresql:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rentalapp
+      RABBITMQ_PASS: m07t0-R3n7@L!
+    ports:
+      - 5002:83
+  
+  motorcyclerentalapi:
+    image: ${DOCKER_REGISTRY-}motorcyclerentalapi
+    build: 
+      context: .
+      dockerfile: MotorcycleRentalApi/Dockerfile
+    environment:
+      ASPNETCORE_URLS: "http://*:80"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rentalapp
+      RABBITMQ_PASS: m07t0-R3n7@L!
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - 80:80
+
+volumes:
+  db:
+    driver: local

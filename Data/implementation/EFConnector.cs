@@ -171,6 +171,16 @@ namespace MotorcycleRental.Data
             return await FindVehicleByVIN(vehicleData.VIN!);
         }
 
+        /// <summary>
+        /// Add a notification to database
+        /// </summary>
+        /// <param name="message">The message to add to database</param>
+        public async void Notify(string message)
+        {
+            await Notifications!.AddAsync(new DB.Notification() { Message = message });
+            await _context.SaveChangesAsync();
+        }
+
         public void Dispose()
         {
             _context?.Dispose();

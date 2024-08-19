@@ -117,6 +117,10 @@ namespace MotorcycleService
                         case "list":
                             PublishMessage(ListMotorcycles(e.Body), e);
                             break;
+                        
+                        case "notify":
+                            Notify(e.Body);
+                            break;
                     }
                 }
                 catch (RabbitMQOperationInterruptedException ex)
@@ -142,6 +146,35 @@ namespace MotorcycleService
             if (creationRequest == null)
                 throw new RequiredInformationMissingException();
             var result = _vehicles.CreateVehicle(creationRequest).Result;
+
+            if (result != null)
+            {
+                if (result.Year == 2024)
+                {
+                    try
+                    {
+                        var props = _channel.CreateBasicProperties();
+                        props.CorrelationId = Guid.NewGuid().ToString();
+                        props.ReplyTo = Queues.MRS_OUT;
+                        props.Headers = new Dictionary<string, object>();
+                        props.Headers.Add("request", "notify");
+
+                        byte[] msg = Encoding.UTF8.GetBytes($"A new motorcycle with Year = 2024 was added! ID: {result.Id}");
+                        _channel.BasicPublish(
+                            string.Empty,
+                            Queues.MRS_IN,
+                            props,
+                            msg
+                        );
+                    }
+                    catch (RabbitMQOperationInterruptedException ex)
+                    {
+                        _logger.LogError(ex, ex.Message);
+                        throw;
+                    }
+                }
+            }
+
             return JS.JsonSerializer.Serialize(result);
         }
 
@@ -153,6 +186,12 @@ namespace MotorcycleService
                 throw new RequiredInformationMissingException();
             var result = _vehicles.EditVIN(editRequest).Result;
             return JS.JsonSerializer.Serialize(result);
+        }
+
+        private void Notify(ReadOnlyMemory<byte> body)
+        {
+            string message = Encoding.UTF8.GetString(body.ToArray());
+            _vehicles.Notify(message);
         }
         #endregion
 

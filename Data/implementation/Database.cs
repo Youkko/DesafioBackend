@@ -54,5 +54,11 @@ namespace MotorcycleRental.Data
         /// <returns>Motorcycle object || null</returns>
         public Task<Motorcycle?> CreateVehicle(MotorcycleCreation vehicleData) =>
             _connector.CreateVehicle(vehicleData);
+        
+        /// <summary>
+        /// Add a notification to database
+        /// </summary>
+        /// <param name="message">The message to add to database</param>
+        public void Notify(string message) => _connector.Notify(message);
     }
 }

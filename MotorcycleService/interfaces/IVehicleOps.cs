@@ -25,5 +25,10 @@ namespace DeliveryPersonService
         /// <exception cref="VehicleNotFoundException"></exception>
         /// <exception cref="VINInUseException"></exception>
         Task<bool> EditVIN(VINEditionParams vinParams);
+        /// <summary>
+        /// Add a notification to database
+        /// </summary>
+        /// <param name="message">The message to add to database</param>
+        public void Notify(string message);
     }
 }

@@ -77,5 +77,17 @@ namespace DeliveryPersonService
 
             return await _database.ReplaceVIN(vinParams);
         }
+
+        /// <summary>
+        /// Add a notification to database
+        /// </summary>
+        /// <param name="message">The message to add to database</param>
+        public void Notify(string message)
+        {
+            if (!string.IsNullOrEmpty(message))
+            {
+                _database.Notify(message);
+            }
+        }
     }
 }

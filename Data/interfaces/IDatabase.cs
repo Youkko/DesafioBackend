@@ -1,4 +1,5 @@
 ﻿using MotorcycleRental.Models.DTO;
+using MotorcycleRental.Models.Errors;
 namespace MotorcycleRental.Data
 {
     public interface IDatabase
@@ -19,21 +20,28 @@ namespace MotorcycleRental.Data
         /// <summary>
         /// Find an existing vehicle in the system by it's VIN
         /// </summary>
-        /// <param name="VIN">VIN number (exact match, case-insensitive).</param>
+        /// <param name="data">VIN number (exact match, case-insensitive).</param>
         /// <returns>Motorcycle object || null</returns>
-        Task<Motorcycle?> FindVehicleByVIN(string VIN);
+        Task<Motorcycle?> FindVehicleByVIN(SearchVehicleParams data);
         /// <summary>
         /// Replace VIN information for an existing vehicle
         /// </summary>
-        /// <param name="vinParams">VIN edition data (Existing VIN, New VIN)</param>
+        /// <param name="data">VIN edition data (Existing VIN, New VIN)</param>
         /// <returns>Boolean wether edition was successful</returns>
-        Task<bool> ReplaceVIN(VINEditionParams vinParams);
+        Task<bool> ReplaceVIN(EditVehicleParams data);
         /// <summary>
         /// Create a new vehicle in system.
         /// </summary>
-        /// <param name="vehicleData">Vehicle details</param>
+        /// <param name="data">Vehicle details</param>
         /// <returns>Motorcycle object || null</returns>
-        Task<Motorcycle?> CreateVehicle(MotorcycleCreation vehicleData);
+        Task<Motorcycle?> CreateVehicle(CreateVehicleParams data);
+        /// <summary>
+        /// Delete an existing vehicle by it's VIN information IF it has no rentals
+        /// </summary>
+        /// <param name="data">VIN</param>
+        /// <returns>Boolean wether deletion was successful</returns>
+        /// <exception cref="VehicleHasRentalsException"></exception>
+        Task<bool> DeleteVehicle(DeleteVehicleParams data);
         /// <summary>
         /// Add a notification to database
         /// </summary>

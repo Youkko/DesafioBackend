@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MotorcycleRental.Models.Errors;
 using DB = MotorcycleRental.Models.Database;
 using DTO = MotorcycleRental.Models.DTO;
 namespace MotorcycleRental.Data
@@ -124,13 +125,13 @@ namespace MotorcycleRental.Data
         /// <summary>
         /// Find an existing vehicle in the system by its VIN
         /// </summary>
-        /// <param name="VIN">VIN number (exact match, case-insensitive).</param>
+        /// <param name="data">VIN number (exact match, case-insensitive).</param>
         /// <returns>Motorcycle object || null</returns>
-        public async Task<DTO.Motorcycle?> FindVehicleByVIN(string VIN)
+        public async Task<DTO.Motorcycle?> FindVehicleByVIN(DTO.SearchVehicleParams data)
         {
             var vehicle = await Motorcycles!
                 .FirstOrDefaultAsync(m => m.VIN != null &&
-                                          m.VIN.ToLower() == VIN.ToLower());
+                                          m.VIN.ToLower() == data.VIN!.ToLower());
             
             return vehicle != null ? new DTO.Motorcycle(vehicle) : null;
         }
@@ -138,19 +139,19 @@ namespace MotorcycleRental.Data
         /// <summary>
         /// Replace VIN information for an existing vehicle
         /// </summary>
-        /// <param name="vinParams">VIN edition data (Existing VIN, New VIN)</param>
+        /// <param name="data">VIN edition data (Existing VIN, New VIN)</param>
         /// <returns>Boolean wether edition was successful</returns>
-        public async Task<bool> ReplaceVIN(DTO.VINEditionParams vinParams)
+        public async Task<bool> ReplaceVIN(DTO.EditVehicleParams data)
         {
             var vehicle = await Motorcycles!
                 .Where(m => !string.IsNullOrEmpty(m.VIN) &&
-                            !string.IsNullOrEmpty(vinParams.ExistingVIN) &&
-                            m.VIN.ToLower() == vinParams.ExistingVIN.ToLower())
+                            !string.IsNullOrEmpty(data.ExistingVIN) &&
+                            m.VIN.ToLower() == data.ExistingVIN.ToLower())
                 .FirstOrDefaultAsync();
 
             if (vehicle != null)
             {
-                vehicle.VIN = vinParams.NewVIN;
+                vehicle.VIN = data.NewVIN;
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -160,21 +161,50 @@ namespace MotorcycleRental.Data
         /// <summary>
         /// Create a new vehicle in system.
         /// </summary>
-        /// <param name="vehicleData">Vehicle details</param>
+        /// <param name="data">Vehicle details</param>
         /// <returns>Motorcycle object || null</returns>
-        public async Task<DTO.Motorcycle?> CreateVehicle(DTO.MotorcycleCreation vehicleData)
+        public async Task<DTO.Motorcycle?> CreateVehicle(DTO.CreateVehicleParams data)
         {
             var newVehicle = await Motorcycles!.AddAsync(new()
             {
-                Brand = vehicleData.Brand,
-                Model = vehicleData.Model,
-                VIN = vehicleData.VIN,
-                Year = vehicleData.Year,
+                Brand = data.Brand,
+                Model = data.Model,
+                VIN = data.VIN,
+                Year = data.Year,
             });
 
             var results = await _context.SaveChangesAsync();
 
-            return await FindVehicleByVIN(vehicleData.VIN!);
+            return await FindVehicleByVIN(new() { VIN = data.VIN });
+        }
+
+        /// <summary>
+        /// Delete an existing vehicle by it's VIN information IF it has no rentals
+        /// </summary>
+        /// <param name="data">VIN</param>
+        /// <returns>Boolean wether deletion was successful</returns>
+        /// <exception cref="VehicleHasRentalsException"></exception>
+        public async Task<bool> DeleteVehicle(DTO.DeleteVehicleParams data)
+        {
+            var vehicle = await Motorcycles!
+                .Where(m => !string.IsNullOrEmpty(m.VIN) &&
+                            !string.IsNullOrEmpty(data.VIN) &&
+                            m.VIN.ToLower() == data.VIN.ToLower())
+                .FirstOrDefaultAsync();
+
+            if (vehicle != null)
+            {
+                if ((vehicle.Rentals != null && vehicle.Rentals.Count == 0) ||
+                    vehicle.Rentals == null)
+                {
+                    Motorcycles!.Remove(vehicle);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                    throw new VehicleHasRentalsException();
+            }
+            return false;
         }
 
         /// <summary>

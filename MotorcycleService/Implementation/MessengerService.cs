@@ -19,6 +19,9 @@ namespace MotorcycleService
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly RabbitMQSettings _settings;
+        private readonly Dictionary<string, Func<ReadOnlyMemory<byte>, string>>
+            actionMap,
+            mgmtActionMap;
         #endregion
 
         #region Constructor
@@ -40,129 +43,47 @@ namespace MotorcycleService
 
             _channel = _connection.CreateModel();
             DeclareQueues();
+            mgmtActionMap = new()
+            {
+                { Commands.CREATEVEHICLE, CreateMotorcycle },
+                { Commands.EDITVIN, EditVIN },
+                { Commands.DELETEVEHICLE, DeleteMotorcycle },
+            };
+            actionMap = new()
+            {
+                { Commands.LISTVEHICLES, ListMotorcycles },
+                { Commands.NOTIFY, Notify },
+            };
         }
         #endregion
 
         #region Private methods
-        private void DeclareQueues()
-        {
-            foreach (
-                var queue
-                in Queues.All.Where(q =>
-                    q.Key.StartsWith("mrs_", StringComparison.InvariantCultureIgnoreCase)))
-            {
-                _channel.QueueDeclare(
-                    queue: queue.Value,
-                    durable: true,
-                    exclusive: false,
-                    autoDelete: false,
-                    arguments: null);
-            }
-        }
 
-        private void PublishMessage(string message, BasicDeliverEventArgs e)
-        {
-            byte[] msg = Encoding.UTF8.GetBytes(message);
-            _channel.BasicPublish(
-                string.Empty,
-                e.BasicProperties.ReplyTo,
-                e.BasicProperties,
-                msg
-            );
-        }
-
-        private void OnMgmtMessageReceived(object? sender, BasicDeliverEventArgs e)
-        {
-            var props = e.BasicProperties;
-
-            if (props.Headers != null &&
-                props.Headers.TryGetValue("request", out var operationBytes))
-            {
-                var operation = Encoding.UTF8.GetString((byte[])operationBytes);
-
-                try
-                {
-                    switch (operation)
-                    {
-                        case "createvehicle":
-                            PublishMessage(CreateMotorcycle(e.Body), e);
-                            break;
-
-                        case "editvin":
-                            PublishMessage(EditVIN(e.Body), e);
-                            break;
-                    }
-                }
-                catch (RabbitMQOperationInterruptedException ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    throw;
-                }
-            }
-        }
-
-        private void OnMessageReceived(object? sender, BasicDeliverEventArgs e)
-        {
-            var props = e.BasicProperties;
-
-            if (props.Headers != null && 
-                props.Headers.TryGetValue("request", out var operationBytes))
-            {
-                var operation = Encoding.UTF8.GetString((byte[])operationBytes);
-
-                try
-                {
-                    switch (operation)
-                    {
-                        case "list":
-                            PublishMessage(ListMotorcycles(e.Body), e);
-                            break;
-                        
-                        case "notify":
-                            Notify(e.Body);
-                            break;
-                    }
-                }
-                catch (RabbitMQOperationInterruptedException ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    throw;
-                }
-            }
-        }
-
-        private string ListMotorcycles(ReadOnlyMemory<byte> body)
-        {
-            string message = Encoding.UTF8.GetString(body.ToArray());
-            var motos = _vehicles.ListMotorcycles(message).Result;
-            string requestMessage = JS.JsonSerializer.Serialize(motos);
-            return requestMessage;
-        }
-
+        #region -> Action methods
         private string CreateMotorcycle(ReadOnlyMemory<byte> body)
         {
-            Motorcycle? result = null;
-            string message = Encoding.UTF8.GetString(body.ToArray());
-            var creationRequest = JsonConvert.DeserializeObject<MotorcycleCreation>(message);
-            if (creationRequest == null)
-                throw new RequiredInformationMissingException();
+            Response? response = null;
             try
             {
-                result = _vehicles.CreateVehicle(creationRequest).Result;
-
+                var data = DeserializeMessage<CreateVehicleParams>(body.ToArray());
+                response = _vehicles.CreateVehicle(data!).Result;
             }
             catch (AggregateException aEx)
             {
+                response = new(string.Empty, false);
                 aEx.Flatten().Handle(ex =>
                 {
+                    response.Message = ex.Message;
                     _logger.LogError(ex, ex.Message);
-                    throw ex;
+                    return true;
                 });
+                return JS.JsonSerializer.Serialize(response);
             }
 
-            if (result != null)
+            if (response != null)
             {
-                if (result.Year == 2024)
+                Motorcycle? result = JsonConvert.DeserializeObject<Motorcycle>(response.Message!.ToString()!);
+                if (result != null && result.Year == 2024)
                 {
                     try
                     {
@@ -182,50 +103,212 @@ namespace MotorcycleService
                     }
                     catch (RabbitMQOperationInterruptedException ex)
                     {
+                        response = new(ex.Message, false);
                         _logger.LogError(ex, ex.Message);
-                        throw;
+                        return JS.JsonSerializer.Serialize(response);
                     }
                     catch (AggregateException aEx)
                     {
+                        response = new(string.Empty, false);
                         aEx.Flatten().Handle(ex =>
                         {
+                            response.Message = ex.Message;
                             _logger.LogError(ex, ex.Message);
-                            throw ex;
+                            return true;
                         });
+                        return JS.JsonSerializer.Serialize(response);
                     }
                 }
             }
 
-            return JS.JsonSerializer.Serialize(result);
+            return JS.JsonSerializer.Serialize(response);
         }
 
         private string EditVIN(ReadOnlyMemory<byte> body)
         {
             try
             {
-                string message = Encoding.UTF8.GetString(body.ToArray());
-                var editRequest = JsonConvert.DeserializeObject<VINEditionParams>(message);
-                if (editRequest == null)
-                    throw new RequiredInformationMissingException();
-                var result = _vehicles.EditVIN(editRequest).Result;
+                var data = DeserializeMessage<EditVehicleParams>(body.ToArray());
+                var result = _vehicles.EditVehicle(data!).Result;
                 return JS.JsonSerializer.Serialize(result);
             }
             catch (AggregateException aEx)
             {
+                Response response = new(string.Empty, false);
                 aEx.Flatten().Handle(ex =>
                 {
+                    response.Message = ex.Message;
                     _logger.LogError(ex, ex.Message);
                     return true;
                 });
-                return JS.JsonSerializer.Serialize(false);
+                return JS.JsonSerializer.Serialize(response);
             }
         }
 
-        private void Notify(ReadOnlyMemory<byte> body)
+        private string DeleteMotorcycle(ReadOnlyMemory<byte> body)
         {
-            string message = Encoding.UTF8.GetString(body.ToArray());
-            _vehicles.Notify(message);
+            try
+            {
+                var data = DeserializeMessage<DeleteVehicleParams>(body.ToArray());
+                var response = _vehicles.DeleteVehicle(data!).Result;
+                return JS.JsonSerializer.Serialize(response);
+            }
+            catch (AggregateException aEx)
+            {
+                Response response = new(string.Empty, false);
+                aEx.Flatten().Handle(ex =>
+                {
+                    response.Message = ex.Message;
+                    _logger.LogError(ex, ex.Message);
+                    return true;
+                });
+                return JS.JsonSerializer.Serialize(response);
+            }
         }
+
+        private string ListMotorcycles(ReadOnlyMemory<byte> body)
+        {
+            try
+            {
+                var data = DeserializeMessage<SearchVehicleParams>(body.ToArray());
+                var vehicles = _vehicles.ListVehicles(data!).Result;
+                return JS.JsonSerializer.Serialize(vehicles);
+            }
+            catch (AggregateException aEx)
+            {
+                Response response = new(string.Empty, false);
+                aEx.Flatten().Handle(ex =>
+                {
+                    response.Message = ex.Message;
+                    _logger.LogError(ex, ex.Message);
+                    return true;
+                });
+                return JS.JsonSerializer.Serialize(response);
+            }
+        }
+        
+        private string Notify(ReadOnlyMemory<byte> body)
+        {
+            try
+            {
+                string message = Encoding.UTF8.GetString(body.ToArray());
+                _vehicles.Notify(message);
+                return message;
+            }
+            catch (AggregateException aEx)
+            {
+                Response response = new(string.Empty, false);
+                aEx.Flatten().Handle(ex =>
+                {
+                    response.Message = ex.Message;
+                    _logger.LogError(ex, ex.Message);
+                    return true;
+                });
+                return JS.JsonSerializer.Serialize(response);
+            }
+        }
+        #endregion
+
+        #region -> Messaging system
+        private void DeclareQueues()
+        {
+            foreach (
+                var queue
+                in Queues.All.Where(q =>
+                    q.Key.StartsWith("mrs_", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                _channel.QueueDeclare(
+                    queue: queue.Value,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
+            }
+        }
+        
+        private void PublishMessage(string message, BasicDeliverEventArgs e)
+        {
+            byte[] msg = Encoding.UTF8.GetBytes(message);
+            _channel.BasicPublish(
+                string.Empty,
+                e.BasicProperties.ReplyTo,
+                e.BasicProperties,
+                msg
+            );
+        }
+
+        private string GetRequest(BasicDeliverEventArgs args)
+        {
+            string request = string.Empty;
+            var props = args.BasicProperties;
+            if (props.Headers != null &&
+                props.Headers.TryGetValue("request", out var operationBytes))
+            {
+                request = Encoding.UTF8.GetString((byte[])operationBytes);
+            }
+            return request;
+        }
+
+        private T? DeserializeMessage<T>(byte[] bMessage, bool required = true)
+        {
+            var response = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bMessage));
+            if (required && response == null)
+                throw new RequiredInformationMissingException();
+            return response;
+        }
+
+        private void OnMgmtMessageReceived(object? sender, BasicDeliverEventArgs e)
+        {
+
+            string request = GetRequest(e);
+            if (!string.IsNullOrEmpty(request))
+            {
+                try
+                {
+                    if (mgmtActionMap.TryGetValue(request, out var action))
+                    {
+                        string response = action(e.Body);
+                        PublishMessage(response, e);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Unknown request: {Request}", request);
+                    }
+                }
+                catch (RabbitMQOperationInterruptedException ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    throw;
+                }
+            }
+        }
+
+        private void OnMessageReceived(object? sender, BasicDeliverEventArgs e)
+        {
+            string request = GetRequest(e);
+            if (!string.IsNullOrEmpty(request))
+            {
+                try
+                {
+                    if (actionMap.TryGetValue(request, out var action))
+                    {
+                        string response = action(e.Body);
+                        PublishMessage(response, e);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Unknown request: {Request}", request);
+                    }
+                }
+                catch (RabbitMQOperationInterruptedException ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    throw;
+                }
+            }
+        }
+        #endregion
+
         #endregion
 
         #region Public methods

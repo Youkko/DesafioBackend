@@ -1,6 +1,7 @@
 ﻿using DatabaseConfig = MotorcycleRental.Models.Database.DatabaseConfig;
 using Microsoft.Extensions.Options;
 using MotorcycleRental.Models.DTO;
+using MotorcycleRental.Models.Errors;
 namespace MotorcycleRental.Data
 {
     public class Database : IDatabase
@@ -36,27 +37,36 @@ namespace MotorcycleRental.Data
         /// <summary>
         /// Find an existing motorcycles in the system by it's VIN
         /// </summary>
-        /// <param name="VIN">VIN number (exact match, case-insensitive).</param>
+        /// <param name="data">VIN number (exact match, case-insensitive).</param>
         /// <returns>Motorcycle object || null</returns>
-        public Task<Motorcycle?> FindVehicleByVIN(string VIN) =>
-            _connector.FindVehicleByVIN(VIN);
+        public Task<Motorcycle?> FindVehicleByVIN(SearchVehicleParams data) =>
+            _connector.FindVehicleByVIN(data);
 
         /// <summary>
         /// Replace VIN information for an existing vehicle
         /// </summary>
-        /// <param name="vinParams">VIN edition data (Existing VIN, New VIN)</param>
+        /// <param name="data">VIN edition data (Existing VIN, New VIN)</param>
         /// <returns>Boolean wether edition was successful</returns>
-        public Task<bool> ReplaceVIN(VINEditionParams vinParams) =>
-            _connector.ReplaceVIN(vinParams);
+        public Task<bool> ReplaceVIN(EditVehicleParams data) =>
+            _connector.ReplaceVIN(data);
 
         /// <summary>
         /// Create a new vehicle in system.
         /// </summary>
-        /// <param name="vehicleData">Vehicle details</param>
+        /// <param name="data">Vehicle details</param>
         /// <returns>Motorcycle object || null</returns>
-        public Task<Motorcycle?> CreateVehicle(MotorcycleCreation vehicleData) =>
-            _connector.CreateVehicle(vehicleData);
-        
+        public Task<Motorcycle?> CreateVehicle(CreateVehicleParams data) =>
+            _connector.CreateVehicle(data);
+
+        /// <summary>
+        /// Delete an existing vehicle by it's VIN information IF it has no rentals
+        /// </summary>
+        /// <param name="data">VIN</param>
+        /// <returns>Boolean wether deletion was successful</returns>
+        /// <exception cref="VehicleHasRentalsException"></exception>
+        public Task<bool> DeleteVehicle(DeleteVehicleParams data) =>
+            _connector.DeleteVehicle(data);
+
         /// <summary>
         /// Add a notification to database
         /// </summary>

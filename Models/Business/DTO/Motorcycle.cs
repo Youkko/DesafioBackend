@@ -6,8 +6,8 @@
         public string? Model { get; set; }
         public int? Year { get; set; }
         public string? Brand { get; set; }
-
-        //public ICollection<Rental>? Rentals { get; set; }
+        public ICollection<Rental>? Rentals { get; set; }
+        
         public Motorcycle() { }
 
         public Motorcycle(Database.Motorcycle motorcycle)
@@ -19,6 +19,16 @@
             Brand = motorcycle.Brand;
             CreatedOn = motorcycle.CreatedOn;
             ModifiedOn = motorcycle.ModifiedOn;
+            List<Rental> rentals = new List<Rental>();
+            if (motorcycle.Rentals != null &&
+                motorcycle.Rentals.Count > 0)
+            {
+                foreach (var rental in motorcycle.Rentals)
+                {
+                    rentals.Add(new Rental(rental));
+                }
+            }
+            Rentals = rentals;
         }
     }
 }

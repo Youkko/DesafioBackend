@@ -51,22 +51,22 @@ namespace MotorcycleRental.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f5f1bf95-be0e-4867-a809-20470e49b1c7"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(411),
+                            Id = new Guid("505220b8-7133-4df7-9b9b-7df22e8ff6ea"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(6036),
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "A"
                         },
                         new
                         {
-                            Id = new Guid("0d9caa0d-a47e-45a4-9d70-dfccb9e7379e"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(415),
+                            Id = new Guid("c0946d17-e372-4278-abca-0bf8698e8cb8"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(6041),
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "B"
                         },
                         new
                         {
-                            Id = new Guid("6629c5ff-adbf-4e9f-96c5-b343a5727680"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(417),
+                            Id = new Guid("ba980615-c218-4caa-8b10-224e4eb2545a"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(6053),
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Type = "AB"
                         });
@@ -117,10 +117,6 @@ namespace MotorcycleRental.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("CNHImage")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Guid>("CNHTypeId")
                         .HasColumnType("uuid");
 
@@ -136,7 +132,7 @@ namespace MotorcycleRental.Data.Migrations
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -344,40 +340,40 @@ namespace MotorcycleRental.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("261b4e1a-8336-4ab4-a32b-4ee3643de7b1"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1557),
+                            Id = new Guid("c849a633-ce44-4c67-a1d6-bb74847d1538"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7052),
                             Days = 7,
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = 30.0
                         },
                         new
                         {
-                            Id = new Guid("2eb9291c-c37c-474b-b09a-7cb32125404d"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1561),
+                            Id = new Guid("3c558cd8-2571-4d95-ab00-9ba2f7a6421a"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7056),
                             Days = 15,
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = 28.0
                         },
                         new
                         {
-                            Id = new Guid("c5b6eb2c-a265-4225-bcee-7fe2a34b0c9a"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1563),
+                            Id = new Guid("b713dcad-6351-4c1a-a622-d32ef20d3c0a"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7057),
                             Days = 30,
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = 22.0
                         },
                         new
                         {
-                            Id = new Guid("c8a1c8dc-2c9a-49bc-b58c-5e376a7b7cac"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1564),
+                            Id = new Guid("f31993a0-03c7-4df5-bde4-3a643514c614"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7063),
                             Days = 45,
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = 20.0
                         },
                         new
                         {
-                            Id = new Guid("958572c5-2916-416f-abf0-765bf292e08c"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1568),
+                            Id = new Guid("2d9cd8a7-aba5-411b-ab9f-1700266b0da9"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7064),
                             Days = 50,
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = 18.0
@@ -422,11 +418,6 @@ namespace MotorcycleRental.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.Property<Guid>("UserTypeId")
                         .HasColumnType("uuid");
 
@@ -439,16 +430,15 @@ namespace MotorcycleRental.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ea6753d4-329b-4cc2-942c-79b7a0a8545c"),
+                            Id = new Guid("f1736674-a197-4de4-ad15-7adac6a29627"),
                             BirthDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 360, DateTimeKind.Utc).AddTicks(2894),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 205, DateTimeKind.Utc).AddTicks(1079),
                             Email = "sysadmin@desafiobackend.com",
                             Enabled = true,
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "SysAdmin",
-                            Password = "S1tdGqIA6QayOV6ksIa4wCX9lCHlXd38ChV+SmKVNhXevHDaOjqpfX7kyj3JES88",
-                            PhoneNumber = "1234567890",
-                            UserTypeId = new Guid("901469f3-8641-402a-a953-18b5d574d4cd")
+                            Password = "61duyL+UTBCL47MIh66Fr3ib8tYo674LVYAL+c1hCdHINuI2WVWghEI9x4MT7OGK",
+                            UserTypeId = new Guid("29dcbbe6-d2eb-4c56-9ad7-331ed7a2a55f")
                         });
                 });
 
@@ -477,15 +467,15 @@ namespace MotorcycleRental.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("901469f3-8641-402a-a953-18b5d574d4cd"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(2352),
+                            Id = new Guid("29dcbbe6-d2eb-4c56-9ad7-331ed7a2a55f"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 198, DateTimeKind.Utc).AddTicks(574),
                             Description = "ADMIN",
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = new Guid("4eb0b97e-6649-46dd-a9fb-a7f497c1af21"),
-                            CreatedOn = new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(2356),
+                            Id = new Guid("1f2b9e27-5fea-481a-84d9-ec2ac83d13d7"),
+                            CreatedOn = new DateTime(2024, 8, 23, 6, 15, 56, 198, DateTimeKind.Utc).AddTicks(581),
                             Description = "USER",
                             ModifiedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -512,7 +502,9 @@ namespace MotorcycleRental.Data.Migrations
 
                     b.HasOne("MotorcycleRental.Models.Database.User", "User")
                         .WithMany("DeliveryPerson")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("CNHType");
 

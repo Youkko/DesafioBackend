@@ -15,6 +15,7 @@ namespace DeliveryPersonService
         #region Object Instances
         private readonly ILogger<MessengerService> _logger;
         private readonly IAuthentication _auth;
+        private readonly IUserOps _users;
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly RabbitMQSettings _settings;
@@ -29,10 +30,12 @@ namespace DeliveryPersonService
             IOptions<RabbitMQSettings> options,
             ILogger<MessengerService> logger,
             IAuthentication auth,
+            IUserOps users,
             IDatabase database)
         {
             _logger = logger;
             _auth = auth;
+            _users = users;
             _settings = options.Value;
             _connection = new ConnectionFactory()
             {
@@ -44,7 +47,10 @@ namespace DeliveryPersonService
             _channel = _connection.CreateModel();
             DeclareQueues();
             mgmtActionMap = new();
-            actionMap = new();
+            actionMap = new()
+            {
+                { Commands.CREATEUSER, CreateUser },
+            };
             authActionMap = new()
             {
                 { Commands.AUTHENTICATE, AuthenticateClient },
@@ -76,6 +82,29 @@ namespace DeliveryPersonService
             }
             return JS.JsonSerializer.Serialize(response);
         }
+
+        private string CreateUser(ReadOnlyMemory<byte> body)
+        {
+            Response? response = null;
+            try
+            {
+                var data = DeserializeMessage<CreateUserParams>(body.ToArray());
+                response = _users.CreateUser(data!).Result;
+            }
+            catch (AggregateException aEx)
+            {
+                response = new(string.Empty, false);
+                aEx.Flatten().Handle(ex =>
+                {
+                    response.Message = ex.Message;
+                    _logger.LogError(ex, ex.Message);
+                    return true;
+                });
+                return JS.JsonSerializer.Serialize(response);
+            }
+            return JS.JsonSerializer.Serialize(response);
+        }
+
         #endregion
 
         #region -> Messaging system

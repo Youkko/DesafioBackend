@@ -152,7 +152,6 @@ namespace MotorcycleRental.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Password = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Enabled = table.Column<bool>(type: "boolean", nullable: true, defaultValue: true),
@@ -179,8 +178,7 @@ namespace MotorcycleRental.Data.Migrations
                     CNPJ = table.Column<string>(type: "text", nullable: false),
                     CNH = table.Column<string>(type: "text", nullable: false),
                     CNHTypeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CNHImage = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     ModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -197,7 +195,8 @@ namespace MotorcycleRental.Data.Migrations
                         name: "FK_DeliveryPerson_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -228,9 +227,9 @@ namespace MotorcycleRental.Data.Migrations
                 columns: new[] { "Id", "CreatedOn", "ModifiedOn", "Type" },
                 values: new object[,]
                 {
-                    { new Guid("0d9caa0d-a47e-45a4-9d70-dfccb9e7379e"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(415), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "B" },
-                    { new Guid("6629c5ff-adbf-4e9f-96c5-b343a5727680"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(417), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "AB" },
-                    { new Guid("f5f1bf95-be0e-4867-a809-20470e49b1c7"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(411), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "A" }
+                    { new Guid("505220b8-7133-4df7-9b9b-7df22e8ff6ea"), new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(6036), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "A" },
+                    { new Guid("ba980615-c218-4caa-8b10-224e4eb2545a"), new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(6053), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "AB" },
+                    { new Guid("c0946d17-e372-4278-abca-0bf8698e8cb8"), new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(6041), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "B" }
                 });
 
             migrationBuilder.InsertData(
@@ -238,11 +237,11 @@ namespace MotorcycleRental.Data.Migrations
                 columns: new[] { "Id", "CreatedOn", "Days", "ModifiedOn", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("261b4e1a-8336-4ab4-a32b-4ee3643de7b1"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1557), 7, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 30.0 },
-                    { new Guid("2eb9291c-c37c-474b-b09a-7cb32125404d"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1561), 15, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 28.0 },
-                    { new Guid("958572c5-2916-416f-abf0-765bf292e08c"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1568), 50, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 18.0 },
-                    { new Guid("c5b6eb2c-a265-4225-bcee-7fe2a34b0c9a"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1563), 30, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 22.0 },
-                    { new Guid("c8a1c8dc-2c9a-49bc-b58c-5e376a7b7cac"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(1564), 45, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 20.0 }
+                    { new Guid("2d9cd8a7-aba5-411b-ab9f-1700266b0da9"), new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7064), 50, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 18.0 },
+                    { new Guid("3c558cd8-2571-4d95-ab00-9ba2f7a6421a"), new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7056), 15, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 28.0 },
+                    { new Guid("b713dcad-6351-4c1a-a622-d32ef20d3c0a"), new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7057), 30, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 22.0 },
+                    { new Guid("c849a633-ce44-4c67-a1d6-bb74847d1538"), new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7052), 7, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 30.0 },
+                    { new Guid("f31993a0-03c7-4df5-bde4-3a643514c614"), new DateTime(2024, 8, 23, 6, 15, 56, 197, DateTimeKind.Utc).AddTicks(7063), 45, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 20.0 }
                 });
 
             migrationBuilder.InsertData(
@@ -250,14 +249,14 @@ namespace MotorcycleRental.Data.Migrations
                 columns: new[] { "Id", "CreatedOn", "Description", "ModifiedOn" },
                 values: new object[,]
                 {
-                    { new Guid("4eb0b97e-6649-46dd-a9fb-a7f497c1af21"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(2356), "USER", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("901469f3-8641-402a-a953-18b5d574d4cd"), new DateTime(2024, 8, 19, 6, 1, 29, 353, DateTimeKind.Utc).AddTicks(2352), "ADMIN", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { new Guid("1f2b9e27-5fea-481a-84d9-ec2ac83d13d7"), new DateTime(2024, 8, 23, 6, 15, 56, 198, DateTimeKind.Utc).AddTicks(581), "USER", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("29dcbbe6-d2eb-4c56-9ad7-331ed7a2a55f"), new DateTime(2024, 8, 23, 6, 15, 56, 198, DateTimeKind.Utc).AddTicks(574), "ADMIN", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
                 table: "User",
-                columns: new[] { "Id", "BirthDate", "CreatedOn", "Email", "Enabled", "ModifiedOn", "Name", "Password", "PhoneNumber", "UserTypeId" },
-                values: new object[] { new Guid("ea6753d4-329b-4cc2-942c-79b7a0a8545c"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 8, 19, 6, 1, 29, 360, DateTimeKind.Utc).AddTicks(2894), "sysadmin@desafiobackend.com", true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "SysAdmin", "S1tdGqIA6QayOV6ksIa4wCX9lCHlXd38ChV+SmKVNhXevHDaOjqpfX7kyj3JES88", "1234567890", new Guid("901469f3-8641-402a-a953-18b5d574d4cd") });
+                columns: new[] { "Id", "BirthDate", "CreatedOn", "Email", "Enabled", "ModifiedOn", "Name", "Password", "UserTypeId" },
+                values: new object[] { new Guid("f1736674-a197-4de4-ad15-7adac6a29627"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 8, 23, 6, 15, 56, 205, DateTimeKind.Utc).AddTicks(1079), "sysadmin@desafiobackend.com", true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "SysAdmin", "61duyL+UTBCL47MIh66Fr3ib8tYo674LVYAL+c1hCdHINuI2WVWghEI9x4MT7OGK", new Guid("29dcbbe6-d2eb-4c56-9ad7-331ed7a2a55f") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_CNHType_Type",

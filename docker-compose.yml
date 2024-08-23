@@ -47,6 +47,7 @@ services:
   
   dps:
     image: ${DOCKER_REGISTRY-}dps
+    container_name: dps
     build:
       context: .
       dockerfile: DeliveryPersonService/Dockerfile
@@ -61,6 +62,8 @@ services:
       RABBITMQ_PASS: m07t0-R3n7@L!
     ports:
       - 5001:82
+    volumes:
+      - userdata:/app/data
   
   oms:
     image: ${DOCKER_REGISTRY-}oms
@@ -98,3 +101,4 @@ services:
 volumes:
   db:
     driver: local
+  userdata:

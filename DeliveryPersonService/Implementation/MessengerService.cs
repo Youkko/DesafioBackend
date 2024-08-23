@@ -23,6 +23,7 @@ namespace DeliveryPersonService
             actionMap,
             mgmtActionMap,
             authActionMap;
+        private readonly string cnhFilePath;
         #endregion
 
         #region Constructor
@@ -33,6 +34,7 @@ namespace DeliveryPersonService
             IUserOps users,
             IDatabase database)
         {
+            cnhFilePath = "/app/data/CNH";
             _logger = logger;
             _auth = auth;
             _users = users;
@@ -46,7 +48,10 @@ namespace DeliveryPersonService
 
             _channel = _connection.CreateModel();
             DeclareQueues();
-            mgmtActionMap = new();
+            mgmtActionMap = new()
+            {
+                { Commands.UPLOADCNHIMAGE, CreateFile },
+            };
             actionMap = new()
             {
                 { Commands.CREATEUSER, CreateUser },
@@ -90,6 +95,35 @@ namespace DeliveryPersonService
             {
                 var data = DeserializeMessage<CreateUserParams>(body.ToArray());
                 response = _users.CreateUser(data!).Result;
+            }
+            catch (AggregateException aEx)
+            {
+                response = new(string.Empty, false);
+                aEx.Flatten().Handle(ex =>
+                {
+                    response.Message = ex.Message;
+                    _logger.LogError(ex, ex.Message);
+                    return true;
+                });
+                return JS.JsonSerializer.Serialize(response);
+            }
+            return JS.JsonSerializer.Serialize(response);
+        }
+
+        private string CreateFile(ReadOnlyMemory<byte> body)
+        {
+            Response? response = null;
+            try
+            {
+                var data = DeserializeMessage<UploadFileParams>(body.ToArray());
+                var fileBytes = Convert.FromBase64String(data!.FileContents!);
+                var filePath = Path.Combine(cnhFilePath, $"{data.UserID.ToString()}.{data.Format}");
+                if (!Directory.Exists(cnhFilePath))
+                {
+                    Directory.CreateDirectory(cnhFilePath);
+                }
+                File.WriteAllBytes(filePath, fileBytes);
+                response = new(null, true);
             }
             catch (AggregateException aEx)
             {

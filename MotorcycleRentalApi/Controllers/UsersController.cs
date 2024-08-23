@@ -142,6 +142,81 @@ namespace MotorcycleRentalApi.Controllers
             }
             return await tcs.Task;
         }
+
+        [HttpPost("upload")]
+        [Authorize]
+        public async Task<IActionResult> Upload(IFormFile data)
+        {
+            var tcs = new TaskCompletionSource<IActionResult>();
+            if (data == null || (data.ContentType != "image/png" && data.ContentType != "image/bmp"))
+            {
+                tcs.SetResult(BadRequest(new InvalidFileExtensionException().Message));
+            }
+            else
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value??null;
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    var consumer = new EventingBasicConsumer(_channel);
+
+                    consumer.Received += (ModuleHandle, evtArgs) =>
+                    {
+                        try
+                        {
+                            if (evtArgs.BasicProperties.CorrelationId == correlationID)
+                            {
+                                _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
+                                string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
+                                var response = JsonSerializer.Deserialize<Response>(respStr);
+                                tcs.SetResult(ProcessResponse(response));
+                            }
+                            else
+                            {
+                                _channel.BasicReject(deliveryTag: evtArgs.DeliveryTag, requeue: true);
+                            }
+                        }
+                        catch (RabbitMQOperationInterruptedException ex)
+                        {
+                            _logger.LogError(ex, ex.Message);
+                            tcs.SetResult(StatusCode(500, ex.Message));
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, ex.Message);
+                            tcs.SetResult(StatusCode(500, ex.Message));
+                        }
+                    };
+
+                    string b64 = string.Empty;
+                    using (var ms = new MemoryStream())
+                    {
+                        await data.CopyToAsync(ms);
+                        var bytes = ms.ToArray();
+                        b64 = Convert.ToBase64String(bytes);
+                    }
+                    var uploadContents = new UploadFileParams(Guid.Parse(userId), b64, data.ContentType == "image/png" ? "png" : "bmp");
+
+                    try
+                    {
+                        SendMessageAndListenForResponse(
+                            JsonSerializer.Serialize(uploadContents),
+                            Commands.UPLOADCNHIMAGE,
+                            Queues.DPS_MANAGEIN,
+                            Queues.DPS_MANAGEOUT,
+                            ref consumer);
+                    }
+                    catch (RabbitMQOperationInterruptedException ex)
+                    {
+                        _logger.LogError(ex, ex.Message);
+                        return StatusCode(500, ex.Message);
+                    }
+                }
+                else
+                    tcs.SetResult(Unauthorized());
+            }
+            return await tcs.Task;
+        }
+
         /*
         [HttpPatch()]
         [Authorize]

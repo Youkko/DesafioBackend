@@ -18,6 +18,10 @@ namespace DeliveryPersonService
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly RabbitMQSettings _settings;
+        private readonly Dictionary<string, Func<ReadOnlyMemory<byte>, string>>
+            actionMap,
+            mgmtActionMap,
+            authActionMap;
         #endregion
 
         #region Constructor
@@ -39,10 +43,42 @@ namespace DeliveryPersonService
 
             _channel = _connection.CreateModel();
             DeclareQueues();
+            mgmtActionMap = new();
+            actionMap = new();
+            authActionMap = new()
+            {
+                { Commands.AUTHENTICATE, AuthenticateClient },
+            };
         }
         #endregion
-        
+
         #region Private methods
+
+        #region -> Action methods
+        private string AuthenticateClient(ReadOnlyMemory<byte> body)
+        {
+            Response? response = null;
+            try
+            {
+                var data = DeserializeMessage<UserLogin>(body.ToArray());
+                response = _auth.AuthenticateAsync(data!).Result;
+            }
+            catch (AggregateException aEx)
+            {
+                response = new(string.Empty, false);
+                aEx.Flatten().Handle(ex =>
+                {
+                    response.Message = ex.Message;
+                    _logger.LogError(ex, ex.Message);
+                    return true;
+                });
+                return JS.JsonSerializer.Serialize(response);
+            }
+            return JS.JsonSerializer.Serialize(response);
+        }
+        #endregion
+
+        #region -> Messaging system
         private void DeclareQueues()
         {
             foreach (
@@ -70,22 +106,63 @@ namespace DeliveryPersonService
             );
         }
 
-        private void OnLoginMessageReceived(object? sender, BasicDeliverEventArgs e)
+        private string GetRequest(BasicDeliverEventArgs args)
         {
-            var body = e.Body;
-            string? message = Encoding.UTF8.GetString(body.ToArray());
-            var loginRequest = JsonConvert.DeserializeObject<UserLogin>(message);
-            var result = _auth.AuthenticateAsync(loginRequest!);
-            try
+            string request = string.Empty;
+            var props = args.BasicProperties;
+            if (props.Headers != null &&
+                props.Headers.TryGetValue("request", out var operationBytes))
             {
-                PublishMessage(JS.JsonSerializer.Serialize(result.Result), e);
+                request = Encoding.UTF8.GetString((byte[])operationBytes);
             }
-            catch (RabbitMQOperationInterruptedException ex)
+            return request;
+        }
+
+        private T? DeserializeMessage<T>(byte[] bMessage, bool required = true)
+        {
+            var response = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bMessage));
+            if (required && response == null)
+                throw new RequiredInformationMissingException();
+            return response;
+        }
+
+        private void OnMgmtMessageReceived(object? sender, BasicDeliverEventArgs e) =>
+            RedirectToMap(mgmtActionMap, e);
+
+        private void OnMessageReceived(object? sender, BasicDeliverEventArgs e) =>
+            RedirectToMap(actionMap, e);
+
+        private void OnAuthMessageReceived(object? sender, BasicDeliverEventArgs e) =>
+            RedirectToMap(authActionMap, e);
+
+        private void RedirectToMap(
+            Dictionary<string, Func<ReadOnlyMemory<byte>, string>> map,
+            BasicDeliverEventArgs e)
+        {
+            string request = GetRequest(e);
+            if (!string.IsNullOrEmpty(request))
             {
-                _logger.LogError(ex, ex.Message);
-                throw;
+                try
+                {
+                    if (map.TryGetValue(request, out var action))
+                    {
+                        string response = action(e.Body);
+                        PublishMessage(response, e);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Unknown request: {Request}", request);
+                    }
+                }
+                catch (RabbitMQOperationInterruptedException ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    throw;
+                }
             }
         }
+        #endregion
+
         #endregion
 
         #region Public methods
@@ -95,13 +172,25 @@ namespace DeliveryPersonService
             {
                 _logger.LogInformation("Consumer started at: {time}", DateTimeOffset.Now);
             }
-            var loginConsumer = new EventingBasicConsumer(_channel);
-            loginConsumer.Received += OnLoginMessageReceived;
+            var authConsumer = new EventingBasicConsumer(_channel);
+            var inConsumer = new EventingBasicConsumer(_channel);
+            var inMgmtConsumer = new EventingBasicConsumer(_channel);
+
+            authConsumer.Received += OnAuthMessageReceived;
+            inConsumer.Received += OnMessageReceived;
+            inMgmtConsumer.Received += OnMgmtMessageReceived;
 
             _channel.BasicConsume(queue: Queues.DPS_AUTHIN,
-                                  autoAck: true,
-                                  consumer: loginConsumer);
+                                    autoAck: true,
+                                    consumer: authConsumer);
 
+            _channel.BasicConsume(queue: Queues.DPS_IN,
+                                    autoAck: true,
+                                    consumer: inConsumer);
+
+            _channel.BasicConsume(queue: Queues.DPS_MANAGEIN,
+                                    autoAck: true,
+                                    consumer: inMgmtConsumer);
             return Task.CompletedTask;
         }
 

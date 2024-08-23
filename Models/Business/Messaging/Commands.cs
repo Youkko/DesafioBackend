@@ -3,9 +3,10 @@ namespace MotorcycleRental.Models
 {
     public static class Commands
     {
+        public static string AUTHENTICATE => "authenticate";
         public static string CREATEVEHICLE => "createvehicle";
-        public static string EDITVIN => "editvin";
         public static string DELETEVEHICLE => "deletevehicle";
+        public static string EDITVIN => "editvin";
         public static string LISTVEHICLES => "listvehicles";
         public static string NOTIFY => "notify";
 

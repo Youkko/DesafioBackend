@@ -4,7 +4,7 @@ namespace DeliveryPersonService
 {
     public interface IAuthentication
     {
-        Task<LoginResponse?> AuthenticateAsync(UserLogin userLogin);
+        Task<Response> AuthenticateAsync(UserLogin userLogin);
         SecurityToken? GenerateToken(User user, out string jwtToken);
     }
 }

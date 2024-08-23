@@ -4,6 +4,8 @@ using MotorcycleRental.Models.DTO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using MotorcycleRental.Models.Errors;
+using System.Text.Json;
 namespace DeliveryPersonService
 {
     public class Authentication : IAuthentication
@@ -18,25 +20,22 @@ namespace DeliveryPersonService
             _database = database;
         }
 
-        public async Task<LoginResponse?> AuthenticateAsync(UserLogin userLogin)
+        public async Task<Response> AuthenticateAsync(UserLogin userLogin)
         {
-            LoginResponse response = new(false, string.Empty);
-
             var user = await _database.Authenticate(userLogin);
-            if (user == null)
-            {
-                return null;
-            }
 
-            if (user.IsValid)
-            {
-                string jwt = string.Empty;
-                var token = GenerateToken(user, out jwt);
-                response.IsAuthenticated = user.IsValid;
-                response.Token = jwt;
-            }
+            if (user == null || !user.IsValid)
+                throw new InvalidCredentialsException();
 
-            return response;
+            
+            LoginResponse loginResponse = new(false, string.Empty);
+
+            string jwt = string.Empty;
+            var token = GenerateToken(user, out jwt);
+            loginResponse.IsAuthenticated = user.IsValid;
+            loginResponse.Token = jwt;
+
+            return new(JsonSerializer.Serialize(loginResponse), true);
         }
 
         public SecurityToken? GenerateToken(User user, out string jwtToken)

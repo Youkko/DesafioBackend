@@ -18,21 +18,28 @@ namespace MotorcycleRentalApi
             IConnection connection,
             IModel channel)
         {
-            _connection = new ConnectionFactory()
-            {
-                HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
-                UserName = Environment.GetEnvironmentVariable("RABBITMQ_USER"),
-                Password = Environment.GetEnvironmentVariable("RABBITMQ_PASS")
-            }.CreateConnection();
-
-            _channel = _connection.CreateModel();
+            _connection = connection;
+            _channel = channel;
         }
 
         protected IActionResult ProcessResponse<T>(Response? response)
         {
             return (response == null || !response.Success) ?
                 StatusCode(400, response) :
-                Ok(JsonSerializer.Deserialize<T>(response!.Message!));
+                typeof(T) != typeof(LoginResponse) ?
+                    Ok(JsonSerializer.Deserialize<T>(response!.Message!)) :
+                    ProcessAuthentication(response);
+        }
+
+        private IActionResult ProcessAuthentication(Response? response)
+        {
+            var loginResponse = JsonSerializer.Deserialize<LoginResponse>(response!.Message!);
+
+            bool pass = loginResponse != null &&
+                loginResponse.IsAuthenticated.HasValue &&
+                loginResponse.IsAuthenticated.Value;
+            
+            return pass ? Ok(loginResponse) : Unauthorized();
         }
 
         protected IActionResult ProcessResponse(Response? response)

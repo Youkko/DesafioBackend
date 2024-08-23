@@ -257,40 +257,22 @@ namespace MotorcycleService
             return response;
         }
 
-        private void OnMgmtMessageReceived(object? sender, BasicDeliverEventArgs e)
-        {
+        private void OnMgmtMessageReceived(object? sender, BasicDeliverEventArgs e) =>
+            RedirectToMap(mgmtActionMap, e);
 
-            string request = GetRequest(e);
-            if (!string.IsNullOrEmpty(request))
-            {
-                try
-                {
-                    if (mgmtActionMap.TryGetValue(request, out var action))
-                    {
-                        string response = action(e.Body);
-                        PublishMessage(response, e);
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Unknown request: {Request}", request);
-                    }
-                }
-                catch (RabbitMQOperationInterruptedException ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    throw;
-                }
-            }
-        }
+        private void OnMessageReceived(object? sender, BasicDeliverEventArgs e) =>
+            RedirectToMap(actionMap, e);
 
-        private void OnMessageReceived(object? sender, BasicDeliverEventArgs e)
+        private void RedirectToMap(
+            Dictionary<string, Func<ReadOnlyMemory<byte>, string>> map,
+            BasicDeliverEventArgs e)
         {
             string request = GetRequest(e);
             if (!string.IsNullOrEmpty(request))
             {
                 try
                 {
-                    if (actionMap.TryGetValue(request, out var action))
+                    if (map.TryGetValue(request, out var action))
                     {
                         string response = action(e.Body);
                         PublishMessage(response, e);

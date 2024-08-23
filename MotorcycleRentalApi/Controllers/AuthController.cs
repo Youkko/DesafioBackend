@@ -12,8 +12,11 @@ namespace MotorcycleRentalApi.Controllers
     [Route("[controller]")]
     public class AuthController : CustomControllerBase
     {
+        #region Object Instances
         private readonly ILogger<AuthController> _logger;
-
+        #endregion
+        
+        #region Constructor
         public AuthController(
             ILogger<AuthController> logger,
             IConnection connection,
@@ -32,57 +35,35 @@ namespace MotorcycleRentalApi.Controllers
                     arguments: null);
             }
         }
+        #endregion
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
+        public async Task<IActionResult> Login([FromBody] UserLogin data)
         {
-            correlationID = Guid.NewGuid().ToString();
-            var props = _channel.CreateBasicProperties();
-            props.CorrelationId = correlationID;
-            props.ReplyTo = Queues.DPS_AUTHOUT;
-            
-            try
-            {
-                string serializedMsg = JsonSerializer.Serialize(userLogin);
-                byte[] bytes = Encoding.UTF8.GetBytes(serializedMsg);
-                _channel.BasicPublish(
-                    string.Empty,
-                    Queues.DPS_AUTHIN,
-                    props,
-                    bytes);
-            }
-            catch (RabbitMQOperationInterruptedException ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500, ex.Message);
-            }
-
             var tcs = new TaskCompletionSource<IActionResult>();
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (ModuleHandle, evtArgs) =>
             {
-
                 try
                 {
                     if (evtArgs.BasicProperties.CorrelationId == correlationID)
                     {
                         _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
-                        
-                        var response = JsonSerializer.Deserialize<LoginResponse>(
-                            Encoding.UTF8.GetString(evtArgs.Body.ToArray()));
-
-                        tcs.SetResult(response != null &&
-                                      response.IsAuthenticated.HasValue &&
-                                      response.IsAuthenticated.Value ?  
-                                      Ok(response) :
-                                      Unauthorized());
+                        string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
+                        var response = JsonSerializer.Deserialize<Response>(respStr);
+                        tcs.SetResult(ProcessResponse<LoginResponse>(response));
                     }
                     else
                     {
-                        _channel.BasicReject(deliveryTag: evtArgs.DeliveryTag, requeue: false);
+                        _channel.BasicReject(deliveryTag: evtArgs.DeliveryTag, requeue: true);
                     }
                 }
                 catch (RabbitMQOperationInterruptedException ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    tcs.SetResult(StatusCode(500, ex.Message));
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, ex.Message);
                     tcs.SetResult(StatusCode(500, ex.Message));
@@ -91,10 +72,12 @@ namespace MotorcycleRentalApi.Controllers
 
             try
             {
-                _channel.BasicConsume(
-                    queue: props.ReplyTo,
-                    autoAck: false,
-                    consumer);
+                SendMessageAndListenForResponse(
+                    JsonSerializer.Serialize(data),
+                    Commands.AUTHENTICATE,
+                    Queues.DPS_AUTHIN,
+                    Queues.DPS_AUTHOUT,
+                    ref consumer);
             }
             catch (RabbitMQOperationInterruptedException ex)
             {

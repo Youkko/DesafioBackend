@@ -39,6 +39,7 @@ namespace MotorcycleRentalApi.Controllers
         #endregion
 
         #region Endpoints
+        /*
         [HttpGet()]
         [Authorize]
         public async Task<IActionResult> List([FromQuery] SearchVehicleParams data)
@@ -90,10 +91,10 @@ namespace MotorcycleRentalApi.Controllers
 
             return await tcs.Task;
         }
+        */
 
         [HttpPost()]
-        [Authorize]
-        public async Task<IActionResult> Add([FromBody] CreateVehicleParams data)
+        public async Task<IActionResult> Add([FromBody] CreateUserParams data)
         {
             var tcs = new TaskCompletionSource<IActionResult>();
             var consumer = new EventingBasicConsumer(_channel);
@@ -106,7 +107,7 @@ namespace MotorcycleRentalApi.Controllers
                         _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
                         string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
                         var response = JsonSerializer.Deserialize<Response>(respStr);
-                        tcs.SetResult(ProcessResponse<Motorcycle>(response));
+                        tcs.SetResult(ProcessResponse<CreatedUser>(response));
                     }
                     else
                     {
@@ -129,9 +130,9 @@ namespace MotorcycleRentalApi.Controllers
             {
                 SendMessageAndListenForResponse(
                     JsonSerializer.Serialize(data),
-                    Commands.CREATEVEHICLE,
-                    Queues.MRS_MANAGEIN,
-                    Queues.MRS_MANAGEOUT,
+                    Commands.CREATEUSER,
+                    Queues.DPS_IN,
+                    Queues.DPS_OUT,
                     ref consumer);
             }
             catch (RabbitMQOperationInterruptedException ex)
@@ -141,7 +142,7 @@ namespace MotorcycleRentalApi.Controllers
             }
             return await tcs.Task;
         }
-
+        /*
         [HttpPatch()]
         [Authorize]
         public async Task<IActionResult> Edit([FromBody] EditVehicleParams data)
@@ -245,6 +246,7 @@ namespace MotorcycleRentalApi.Controllers
 
             return await tcs.Task;
         }
+        */
         #endregion
     }
 }

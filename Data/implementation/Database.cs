@@ -72,5 +72,17 @@ namespace MotorcycleRental.Data
         /// </summary>
         /// <param name="message">The message to add to database</param>
         public void Notify(string message) => _connector.Notify(message);
+
+        /// <summary>
+        /// Creates a new user and Delivery Person registry.
+        /// </summary>
+        /// <param name="data">User data</param>
+        /// <returns></returns>
+        /// <exception cref="ExistingCNHException"></exception>
+        /// <exception cref="ExistingCNPJException"></exception>
+        /// <exception cref="InvalidCNHTypeException"></exception>
+        public Task<CreatedUser> CreateUser(CreateUserParams data) => 
+            _connector.CreateUser(data);
+
     }
 }

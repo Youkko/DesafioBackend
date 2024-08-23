@@ -217,6 +217,56 @@ namespace MotorcycleRental.Data
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Creates a new user and Delivery Person registry.
+        /// </summary>
+        /// <param name="data">User data</param>
+        /// <returns></returns>
+        /// <exception cref="ExistingCNHException"></exception>
+        /// <exception cref="ExistingCNPJException"></exception>
+        /// <exception cref="InvalidCNHTypeException"></exception>
+        public async Task<DTO.CreatedUser> CreateUser(DTO.CreateUserParams data)
+        {
+            if (DeliveryPeople!.Any(d => d.CNH == data.CNH))
+                throw new ExistingCNHException();
+
+            if (DeliveryPeople!.Any(d => d.CNPJ == data.CNPJ))
+                throw new ExistingCNPJException();
+
+            var cnhType = CNHTypes!.FirstOrDefault(t => t.Type!.ToLower() == data.CNHType!.ToLower());
+
+            if (cnhType == null)
+                throw new InvalidCNHTypeException();
+
+            var userType = UserTypes!.First(t => t.Description!.ToLower() == "user");
+
+            var resultUsr = await Users!.AddAsync(new()
+            {
+                Name = data.Name,
+                Email = data.Email,
+                BirthDate = data.BirthDate.ToUniversalTime(),
+                Password = PasswordHelper.HashPassword(data.Password!),
+                Enabled = true,
+                UserTypeId = userType.Id
+            });
+
+            var user = resultUsr.Entity;
+            
+            var resultDlv = await DeliveryPeople!.AddAsync(new()
+            {
+                CNH = data.CNH,
+                CNHTypeId = cnhType.Id,
+                CNPJ = data.CNPJ,
+                UserId = user.Id,
+            });
+
+            var delivery = resultDlv.Entity;
+
+            _context.SaveChanges();
+
+            return new(user, delivery, cnhType);
+        }
+
         public void Dispose()
         {
             _context?.Dispose();

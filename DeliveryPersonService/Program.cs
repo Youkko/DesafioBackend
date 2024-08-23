@@ -10,6 +10,7 @@ var connectionString = builder.Configuration.GetConnectionString("MotorcycleRent
 builder.Services.Configure<DatabaseConfig>(o => o.ConnectionString = connectionString);
 builder.Services.AddTransient<IDatabase, Database>();
 builder.Services.AddTransient<IAuthentication, Authentication>();
+builder.Services.AddTransient<IUserOps, UserOps>();
 builder.Services.Configure<RabbitMQSettings>(options =>
 {
     options.HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST");

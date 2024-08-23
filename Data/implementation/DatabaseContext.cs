@@ -48,8 +48,8 @@ namespace MotorcycleRental.Data
         {
             SetupCNHTypes(modelBuilder);
             SetupRentalPlans(modelBuilder);
-            SetupUser(modelBuilder, SetupUserType(modelBuilder));
             SetupDeliveryPerson(modelBuilder);
+            SetupUser(modelBuilder, SetupUserType(modelBuilder));
             SetupMotorcycle(modelBuilder);
 
             SetupDefaultFields<Delivery>(modelBuilder);
@@ -153,10 +153,11 @@ namespace MotorcycleRental.Data
             b.HasIndex(p => p.CNH).IsUnique();
             b.Property(p => p.CNPJ).IsRequired();
             b.Property(p => p.CNH).IsRequired();
-            b.Property(p => p.CNHImage).IsRequired();
             b.HasOne(dp => dp.CNHType).WithMany(cnh => cnh.DeliveryPersons)
                                       .HasForeignKey(dp => dp.CNHTypeId)
                                       .IsRequired();
+            b.HasOne(dp => dp.User).WithMany(usr => usr.DeliveryPerson)
+                                   .HasForeignKey(dp => dp.UserId);
         }
 
         private void SetupMotorcycle(ModelBuilder modelBuilder)
@@ -203,7 +204,6 @@ namespace MotorcycleRental.Data
             var b = modelBuilder.Entity<User>();
             b.Property(s => s.Name).HasMaxLength(200).IsRequired();
             b.Property(s => s.Email).HasMaxLength(100).IsRequired();
-            b.Property(s => s.PhoneNumber).HasMaxLength(20).IsRequired();
             b.Property(s => s.Password).HasMaxLength(200).IsRequired();
             b.Property(s => s.Enabled).HasDefaultValue(true);
             b.HasOne(u => u.UserType).WithMany(ut => ut.Users)
@@ -213,7 +213,6 @@ namespace MotorcycleRental.Data
                 Id = Guid.NewGuid(),
                 Name = "SysAdmin",
                 Email = "sysadmin@desafiobackend.com",
-                PhoneNumber = "1234567890",
                 Password = PasswordHelper.HashPassword("password@1"),
                 Enabled = true,
                 UserTypeId = types!.First(t => t.Description!.Contains("admin", StringComparison.InvariantCultureIgnoreCase)).Id,

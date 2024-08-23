@@ -8,8 +8,6 @@
 
         public Guid CNHTypeId { get; set; }
 
-        public string? CNHImage { get; set; }
-
         public CNHType? CNHType { get; set; }
 
         public virtual User? User { get; set; }

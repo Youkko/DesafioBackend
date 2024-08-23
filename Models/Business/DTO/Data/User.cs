@@ -4,7 +4,6 @@
     {
         public string? Name { get; set; }
         public string? Email { get; set; }
-        public string? PhoneNumber { get; set; }
         public DateTime BirthDate { get; set; }
         public bool? Enabled { get; set; }
         public Guid UserTypeId { get; set; }
@@ -15,7 +14,6 @@
             Id = user.Id;
             Name = user.Name;
             Email = user.Email;
-            PhoneNumber = user.PhoneNumber;
             BirthDate = user.BirthDate;
             Enabled = user.Enabled;
             UserTypeId = user.UserTypeId;

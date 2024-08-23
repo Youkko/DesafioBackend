@@ -11,15 +11,15 @@ namespace MotorcycleRentalApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class VehiclesController : CustomControllerBase
+    public class UsersController : CustomControllerBase
     {
         #region Object Instances
-        private readonly ILogger<VehiclesController> _logger;
+        private readonly ILogger<UsersController> _logger;
         #endregion
 
         #region Constructor
-        public VehiclesController(
-            ILogger<VehiclesController> logger,
+        public UsersController(
+            ILogger<UsersController> logger,
             IConnection connection,
             IModel channel)
             : base(connection, channel)

@@ -7,9 +7,13 @@ namespace DeliveryPersonService
 {
     public class VehicleOps : IVehicleOps
     {
+        #region Object Instances
         private readonly ILogger<VehicleOps> _logger;
         private readonly IConfiguration _configuration;
         private readonly IDatabase _database;
+        #endregion
+
+        #region Constructor
         public VehicleOps(
             ILogger<VehicleOps> logger, 
             IConfiguration configuration,
@@ -19,7 +23,9 @@ namespace DeliveryPersonService
             _configuration = configuration;
             _database = database;
         }
+        #endregion
 
+        #region Private methods
         private string? FilterString(string? input, bool toLower = false)
         {
             if (string.IsNullOrEmpty(input)) return null;
@@ -28,7 +34,9 @@ namespace DeliveryPersonService
             if (input.ToLower() == "null") return null;
             return toLower?result.ToLower():result;
         }
+        #endregion
 
+        #region Public methods
         /// <summary>
         /// List all existing vehicles
         /// </summary>
@@ -90,7 +98,7 @@ namespace DeliveryPersonService
 
                 if (string.IsNullOrEmpty(data.VIN) ||
                     string.IsNullOrEmpty(data.Model) ||
-                    string.IsNullOrEmpty(data.Brand) ||
+                    //string.IsNullOrEmpty(data.Brand) ||
                     !data.Year.HasValue)
                     throw new RequiredInformationMissingException();
                 
@@ -236,5 +244,6 @@ namespace DeliveryPersonService
                 _database.Notify(message);
             }
         }
+        #endregion
     }
 }

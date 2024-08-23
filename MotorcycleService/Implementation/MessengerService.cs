@@ -80,7 +80,7 @@ namespace MotorcycleService
                 return JS.JsonSerializer.Serialize(response);
             }
 
-            if (response != null)
+            if (response != null && response.Success)
             {
                 Motorcycle? result = JsonConvert.DeserializeObject<Motorcycle>(response.Message!.ToString()!);
                 if (result != null && result.Year == 2024)

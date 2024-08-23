@@ -5,31 +5,22 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text.Json;
 using System.Text;
-using RabbitMQ.Client.Exceptions;
 using MotorcycleRental.Models.Errors;
 namespace MotorcycleRentalApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : CustomControllerBase
     {
         private readonly ILogger<AuthController> _logger;
-        private readonly IConnection _connection;
-        private readonly IModel _channel;
-        private string? correlationID;
 
         public AuthController(
-            ILogger<AuthController> logger)
+            ILogger<AuthController> logger,
+            IConnection connection,
+            IModel channel)
+            : base(connection, channel)
         {
             _logger = logger;
-            _connection = new ConnectionFactory()
-            {
-                HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
-                UserName = Environment.GetEnvironmentVariable("RABBITMQ_USER"),
-                Password = Environment.GetEnvironmentVariable("RABBITMQ_PASS")
-            }.CreateConnection();
-
-            _channel = _connection.CreateModel();
 
             foreach (var queue in Queues.All)
             {
@@ -75,6 +66,8 @@ namespace MotorcycleRentalApi.Controllers
                 {
                     if (evtArgs.BasicProperties.CorrelationId == correlationID)
                     {
+                        _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
+                        
                         var response = JsonSerializer.Deserialize<LoginResponse>(
                             Encoding.UTF8.GetString(evtArgs.Body.ToArray()));
 
@@ -83,8 +76,6 @@ namespace MotorcycleRentalApi.Controllers
                                       response.IsAuthenticated.Value ?  
                                       Ok(response) :
                                       Unauthorized());
-
-                        _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
                     }
                     else
                     {
@@ -113,24 +104,5 @@ namespace MotorcycleRentalApi.Controllers
 
             return await tcs.Task;
         }
-        
-        /*
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegisterDto userRegister)
-        {
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Name = userRegister.Name,
-                Email = userRegister.Email,
-                PhoneNumber = userRegister.PhoneNumber,
-                Password = HashPassword(userRegister.Password),
-                CreatedOn = DateTime.UtcNow
-            };
-
-            await _database.AddAsync(user);
-            return Ok();
-        }
-        */
     }
 }

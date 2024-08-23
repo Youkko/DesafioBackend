@@ -143,9 +143,9 @@ namespace MotorcycleRentalApi.Controllers
             return await tcs.Task;
         }
 
-        [HttpPost("upload")]
+        [HttpPost("uploadcnh")]
         [Authorize]
-        public async Task<IActionResult> Upload(IFormFile data)
+        public async Task<IActionResult> UploadCNH(IFormFile data)
         {
             var tcs = new TaskCompletionSource<IActionResult>();
             if (data == null || (data.ContentType != "image/png" && data.ContentType != "image/bmp"))

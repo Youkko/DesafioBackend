@@ -119,19 +119,30 @@ namespace MotorcycleRentalApi.Controllers
         public async Task<IActionResult> Return([FromBody] ReturnParams data)
         {
             var tcs = new TaskCompletionSource<IActionResult>();
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (ModuleHandle, evtArgs) =>
-                HandleConsumerAction<CreatedUser>(_logger, ref evtArgs, ref tcs);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? null;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var returnUserParams = new ReturnUserParams()
+                {
+                    ReturnDate = data.ReturnDate,
+                    VIN = data.VIN,
+                    UserId = Guid.Parse(userId)
+                };
+                var consumer = new EventingBasicConsumer(_channel);
+                consumer.Received += (ModuleHandle, evtArgs) =>
+                    HandleConsumerAction<ReturnInfo>(_logger, ref evtArgs, ref tcs);
 
-            SendMessageAndListenForResponse(
-                JsonSerializer.Serialize(data),
-                Commands.RETURNVEHICLE,
-                Queues.OMS_IN,
-                Queues.OMS_OUT,
-                _logger,
-                ref consumer,
-                ref tcs);
-
+                SendMessageAndListenForResponse(
+                    JsonSerializer.Serialize(returnUserParams),
+                    Commands.RETURNVEHICLE,
+                    Queues.OMS_IN,
+                    Queues.OMS_OUT,
+                    _logger,
+                    ref consumer,
+                    ref tcs);
+            }
+            else
+                tcs.SetResult(Unauthorized());
             return await tcs.Task;
         }
         #endregion

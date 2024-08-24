@@ -1,7 +1,6 @@
 ﻿using MotorcycleRental.Data;
 using MotorcycleRental.Models.DTO;
 using MotorcycleRental.Models.Errors;
-using System.Numerics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 namespace OrderManagementService
@@ -112,7 +111,7 @@ namespace OrderManagementService
         /// </summary>
         /// <param name="data">User ID</param>
         /// <returns>APIResponse object with success status and any relevant data</returns>
-        public async Task<Response> ListUserRentals(string data)
+        public Response ListUserRentals(string data)
         {
             Response response = new(null, true);
             try
@@ -142,40 +141,67 @@ namespace OrderManagementService
         }
 
         /// <summary>
-        /// Return a vehicle
+        /// Calculate the rental total bill based on return date
         /// </summary>
-        /// <param name="data">Vehicle return details</param>
+        /// <param name="data">Rental information (VIN, return date)</param>
         /// <returns>APIResponse object with success status and any relevant data</returns>
-        public async Task<Response> PreviewVehicleReturn(ReturnParams data)
+        public Response PreviewVehicleReturn(ReturnUserParams data)
         {
             Response response = new(null, true);
             try
             {
-                //data.ExistingVIN = FilterString(data.ExistingVIN);
-                //data.NewVIN = FilterString(data.NewVIN);
-                //
-                //if (string.IsNullOrEmpty(data.ExistingVIN) || 
-                //    string.IsNullOrEmpty(data.NewVIN))
-                //    throw new RequiredInformationMissingException();
-                //
-                //var existingVIN = await _database.FindVehicleByVIN(new() { VIN = data.ExistingVIN });
-                //var newVIN = await _database.FindVehicleByVIN(new() { VIN = data.NewVIN });
-                //
-                //if (existingVIN == null)
-                //    throw new VehicleNotFoundException();
-                //
-                //if (newVIN != null)
-                //    throw new VINInUseException();
-                //
-                //bool success = await _database.ReplaceVIN(data);
-                //
-                //response.Success = success;
-                //if (success)
-                //{
-                //    newVIN = await _database.FindVehicleByVIN(new() { VIN = data.NewVIN });
-                //    response.Message = JsonSerializer.Serialize(newVIN);
-                //}
 
+                var rentals = _database.ListUserRentals(data.UserId);
+                var targetRental = rentals
+                    .Where(r => r.Status.Equals("active", StringComparison.InvariantCultureIgnoreCase) &&
+                                r.Vehicle!.VIN!.Equals(data.VIN, StringComparison.InvariantCultureIgnoreCase))
+                    .FirstOrDefault();
+
+                if (targetRental == null)
+                    throw new RentalNotFoundException();
+
+                /*
+                 * As a delivery person, I want to inform the date on which I'll return the vehicle and want to query the rental bill.
+                 * - When informed date is lower than estimated end date, the daily charge will be billed with an additional fee
+                 *   - For the 7-day plan, the fee is 20% over each remaining day.
+                 *   - For the 15-day plan, the fee is 40% over each remaining day.
+                 * - When the informed date is higher than estemated end date, an additional fee of R$50,00 per exceeding day will be charged.
+                 */
+
+                ReturnInfo ri = new()
+                {
+                    StartDate = targetRental.StartDate,
+                    RentalDays = targetRental.Plan!.Days,
+                    PlanValue = targetRental.Plan!.Value,
+                    ReturnDate = data.ReturnDate,
+                    DaysDifference = (data.ReturnDate - targetRental.EndDate).Days,
+                    TotalBill = 0
+                };
+
+                // Return before estimated end date
+                if (ri.DaysDifference < 0) 
+                {
+                    int remainingDays = Math.Abs(ri.DaysDifference);
+                    double feePercentage = 0;
+                    if (ri.RentalDays == 7)
+                        feePercentage = 0.2;
+                    else if (ri.RentalDays == 15)
+                        feePercentage = 0.4;
+
+                    double dailyFee = ri.PlanValue * feePercentage;
+                    ri.TotalBill = remainingDays * (ri.PlanValue + dailyFee);
+                }
+                // Return after estimated end date
+                else if (ri.DaysDifference > 0) 
+                {
+                    double lateFee = 50.00;
+                    ri.TotalBill = ri.DaysDifference * lateFee;
+                }
+
+                // Add the total bill for the actual rental period
+                ri.TotalBill += ri.PlanValue;
+
+                response.Message = JsonSerializer.Serialize(ri);
                 return response;
             }
             catch (AggregateException aEx)

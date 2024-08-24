@@ -46,7 +46,7 @@ namespace OrderManagementService
                 { Commands.LISTRENTALS, ListRentals },
                 { Commands.LISTPLANS, ListPlans },
                 { Commands.HIREVEHICLE, HireVehicle },
-                { Commands.RETURNVEHICLE, ReturnVehicle },
+                { Commands.RETURNVEHICLE, SimulateVehicleReturn },
             };
         }
         #endregion
@@ -59,7 +59,7 @@ namespace OrderManagementService
             Response? response = null;
             try
             {
-                response = _orders.ListUserRentals(Encoding.UTF8.GetString(body.ToArray())).Result;
+                response = _orders.ListUserRentals(Encoding.UTF8.GetString(body.ToArray()));
             }
             catch (Exception ex)
             {
@@ -107,7 +107,7 @@ namespace OrderManagementService
             }
         }
 
-        private string ReturnVehicle(ReadOnlyMemory<byte> body)
+        private string SimulateVehicleReturn(ReadOnlyMemory<byte> body)
         {
             try
             {

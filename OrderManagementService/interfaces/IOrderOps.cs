@@ -16,16 +16,16 @@ namespace OrderManagementService
         /// <returns>APIResponse object with success status and any relevant data</returns>
         Task<Response> HireVehicle(RentalParams data);
         /// <summary>
-        /// Return a vehicle
+        /// Calculate the rental total bill based on return date
         /// </summary>
-        /// <param name="data">Vehicle return details</param>
+        /// <param name="data">Rental information (VIN, return date)</param>
         /// <returns>APIResponse object with success status and any relevant data</returns>
-        Task<Response> PreviewVehicleReturn(ReturnParams data);
+        Response PreviewVehicleReturn(ReturnUserParams data);
         /// <summary>
         /// List user rentals
         /// </summary>
         /// <param name="data">User ID</param>
         /// <returns>APIResponse object with success status and any relevant data</returns>
-        Task<Response> ListUserRentals(string data);
+        Response ListUserRentals(string data);
     }
 }

@@ -111,8 +111,8 @@ namespace OrderManagementService
         {
             try
             {
-                var data = DeserializeMessage<ReturnParams>(body.ToArray());
-                var response = _orders.PreviewVehicleReturn(data!).Result;
+                var data = DeserializeMessage<ReturnUserParams>(body.ToArray());
+                var response = _orders.PreviewVehicleReturn(data!);
                 return JS.JsonSerializer.Serialize(response);
             }
             catch (AggregateException aEx)

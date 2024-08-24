@@ -12,8 +12,6 @@ namespace MotorcycleRental.Data
         public DbSet<Delivery>? Delivery { get; set; }
         public DbSet<DeliveryPerson>? DeliveryPerson { get; set; }
         public DbSet<Vehicle>? Vehicle { get; set; }
-        public DbSet<Order>? Order { get; set; }
-        public DbSet<OrderItem>? OrderItem { get; set; }
         public DbSet<Rental>? Rental { get; set; }
         public DbSet<RentalPlan>? RentalPlan { get; set; }
         public DbSet<User>? User { get; set; }
@@ -54,8 +52,6 @@ namespace MotorcycleRental.Data
             SetupVehicle(modelBuilder);
             SetupDelivery(modelBuilder);
 
-            SetupDefaultFields<Order>(modelBuilder);
-            SetupDefaultFields<OrderItem>(modelBuilder);
             SetupDefaultFields<Notification>(modelBuilder);
         }
 

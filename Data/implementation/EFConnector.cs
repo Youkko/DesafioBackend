@@ -24,8 +24,6 @@ namespace MotorcycleRental.Data
         private DbSet<DB.Delivery>? Deliveries => _context.Delivery;
         private DbSet<DB.DeliveryPerson>? DeliveryPeople => _context.DeliveryPerson;
         private DbSet<DB.Vehicle>? Vehicles => _context.Vehicle;
-        private DbSet<DB.Order>? Orders => _context.Order;
-        private DbSet<DB.OrderItem>? OrderItems => _context.OrderItem;
         private DbSet<DB.Rental>? Rentals => _context.Rental;
         private DbSet<DB.RentalPlan>? RentalPlans => _context.RentalPlan;
         private DbSet<DB.User>? Users => _context.User;

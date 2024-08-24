@@ -4,7 +4,6 @@ using MotorcycleRental.Models.DTO;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text.Json;
-using System.Text;
 using MotorcycleRental.Models.Errors;
 using Microsoft.AspNetCore.Authorization;
 namespace MotorcycleRentalApi.Controllers
@@ -39,107 +38,23 @@ namespace MotorcycleRentalApi.Controllers
         #endregion
 
         #region Endpoints
-        /*
-        [HttpGet()]
-        [Authorize]
-        public async Task<IActionResult> List([FromQuery] SearchVehicleParams data)
-        {
-            var tcs = new TaskCompletionSource<IActionResult>();
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (ModuleHandle, evtArgs) =>
-            {
-                try
-                {
-                    if (evtArgs.BasicProperties.CorrelationId == correlationID)
-                    {
-                        _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
-                        string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
-                        var response = JsonSerializer.Deserialize<Response>(respStr);
-                        tcs.SetResult(ProcessResponse<IEnumerable<Motorcycle>?>(response));
-                    }
-                    else
-                    {
-                        _channel.BasicReject(deliveryTag: evtArgs.DeliveryTag, requeue: true);
-                    }
-                }
-                catch (RabbitMQOperationInterruptedException ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-            };
-
-            try
-            {
-                SendMessageAndListenForResponse(
-                    JsonSerializer.Serialize(data),
-                    Commands.LISTVEHICLES,
-                    Queues.MRS_IN,
-                    Queues.MRS_OUT,
-                    ref consumer);
-            }
-            catch (RabbitMQOperationInterruptedException ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500, ex.Message);
-            }
-
-            return await tcs.Task;
-        }
-        */
-
         [HttpPost()]
         public async Task<IActionResult> Add([FromBody] CreateUserParams data)
         {
             var tcs = new TaskCompletionSource<IActionResult>();
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (ModuleHandle, evtArgs) =>
-            {
-                try
-                {
-                    if (evtArgs.BasicProperties.CorrelationId == correlationID)
-                    {
-                        _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
-                        string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
-                        var response = JsonSerializer.Deserialize<Response>(respStr);
-                        tcs.SetResult(ProcessResponse<CreatedUser>(response));
-                    }
-                    else
-                    {
-                        _channel.BasicReject(deliveryTag: evtArgs.DeliveryTag, requeue: true);
-                    }
-                }
-                catch (RabbitMQOperationInterruptedException ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-            };
+                HandleConsumerAction<CreatedUser>(_logger, ref evtArgs, ref tcs);
 
-            try
-            {
-                SendMessageAndListenForResponse(
-                    JsonSerializer.Serialize(data),
-                    Commands.CREATEUSER,
-                    Queues.DPS_IN,
-                    Queues.DPS_OUT,
-                    ref consumer);
-            }
-            catch (RabbitMQOperationInterruptedException ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500, ex.Message);
-            }
+            SendMessageAndListenForResponse(
+                JsonSerializer.Serialize(data),
+                Commands.CREATEUSER,
+                Queues.DPS_IN,
+                Queues.DPS_OUT,
+                _logger,
+                ref consumer,
+                ref tcs);
+
             return await tcs.Task;
         }
 
@@ -148,44 +63,19 @@ namespace MotorcycleRentalApi.Controllers
         public async Task<IActionResult> UploadCNH(IFormFile data)
         {
             var tcs = new TaskCompletionSource<IActionResult>();
-            if (data == null || (data.ContentType != "image/png" && data.ContentType != "image/bmp"))
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value??null;
+            if (!string.IsNullOrEmpty(userId))
             {
-                tcs.SetResult(BadRequest(new InvalidFileExtensionException().Message));
-            }
-            else
-            {
-                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value??null;
-                if (!string.IsNullOrEmpty(userId))
+                if (data == null || (data.ContentType != "image/png" && data.ContentType != "image/bmp"))
+                {
+                    tcs.SetResult(BadRequest(new InvalidFileExtensionException().Message));
+                }
+                else
                 {
                     var consumer = new EventingBasicConsumer(_channel);
 
                     consumer.Received += (ModuleHandle, evtArgs) =>
-                    {
-                        try
-                        {
-                            if (evtArgs.BasicProperties.CorrelationId == correlationID)
-                            {
-                                _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
-                                string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
-                                var response = JsonSerializer.Deserialize<Response>(respStr);
-                                tcs.SetResult(ProcessResponse(response));
-                            }
-                            else
-                            {
-                                _channel.BasicReject(deliveryTag: evtArgs.DeliveryTag, requeue: true);
-                            }
-                        }
-                        catch (RabbitMQOperationInterruptedException ex)
-                        {
-                            _logger.LogError(ex, ex.Message);
-                            tcs.SetResult(StatusCode(500, ex.Message));
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, ex.Message);
-                            tcs.SetResult(StatusCode(500, ex.Message));
-                        }
-                    };
+                        HandleConsumerAction(_logger, ref evtArgs, ref tcs);
 
                     string b64 = string.Empty;
                     using (var ms = new MemoryStream())
@@ -196,132 +86,20 @@ namespace MotorcycleRentalApi.Controllers
                     }
                     var uploadContents = new UploadFileParams(Guid.Parse(userId), b64, data.ContentType == "image/png" ? "png" : "bmp");
 
-                    try
-                    {
-                        SendMessageAndListenForResponse(
-                            JsonSerializer.Serialize(uploadContents),
-                            Commands.UPLOADCNHIMAGE,
-                            Queues.DPS_MANAGEIN,
-                            Queues.DPS_MANAGEOUT,
-                            ref consumer);
-                    }
-                    catch (RabbitMQOperationInterruptedException ex)
-                    {
-                        _logger.LogError(ex, ex.Message);
-                        return StatusCode(500, ex.Message);
-                    }
+                    SendMessageAndListenForResponse(
+                        JsonSerializer.Serialize(uploadContents),
+                        Commands.UPLOADCNHIMAGE,
+                        Queues.DPS_MANAGEIN,
+                        Queues.DPS_MANAGEOUT,
+                        _logger,
+                        ref consumer,
+                        ref tcs);
                 }
-                else
-                    tcs.SetResult(Unauthorized());
             }
+            else
+                tcs.SetResult(Unauthorized());
             return await tcs.Task;
         }
-
-        /*
-        [HttpPatch()]
-        [Authorize]
-        public async Task<IActionResult> Edit([FromBody] EditVehicleParams data)
-        {
-            var tcs = new TaskCompletionSource<IActionResult>();
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (ModuleHandle, evtArgs) =>
-            {
-                try
-                {
-                    if (evtArgs.BasicProperties.CorrelationId == correlationID)
-                    {
-                        _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
-                        string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
-                        var response = JsonSerializer.Deserialize<Response>(respStr);
-                        tcs.SetResult(ProcessResponse<Motorcycle>(response));
-                    }
-                    else
-                    {
-                        _channel.BasicReject(deliveryTag: evtArgs.DeliveryTag, requeue: true);
-                    }
-                }
-                catch (RabbitMQOperationInterruptedException ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-            };
-
-            try
-            {
-                SendMessageAndListenForResponse(
-                    JsonSerializer.Serialize(data),
-                    Commands.EDITVIN,
-                    Queues.MRS_MANAGEIN,
-                    Queues.MRS_MANAGEOUT,
-                    ref consumer);
-            }
-            catch (RabbitMQOperationInterruptedException ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500, ex.Message);
-            }
-
-            return await tcs.Task;
-        }
-
-        [HttpDelete()]
-        [Authorize]
-        public async Task<IActionResult> Delete([FromBody] DeleteVehicleParams data)
-        {
-            var tcs = new TaskCompletionSource<IActionResult>();
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (ModuleHandle, evtArgs) =>
-            {
-                try
-                {
-                    if (evtArgs.BasicProperties.CorrelationId == correlationID)
-                    {
-                        _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
-                        string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
-                        var response = JsonSerializer.Deserialize<Response>(respStr);
-                        tcs.SetResult(ProcessResponse(response));
-                    }
-                    else
-                    {
-                        _channel.BasicReject(deliveryTag: evtArgs.DeliveryTag, requeue: true);
-                    }
-                }
-                catch (RabbitMQOperationInterruptedException ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-            };
-
-            try
-            {
-                SendMessageAndListenForResponse(
-                    JsonSerializer.Serialize(data),
-                    Commands.DELETEVEHICLE,
-                    Queues.MRS_MANAGEIN,
-                    Queues.MRS_MANAGEOUT,
-                    ref consumer);
-            }
-            catch (RabbitMQOperationInterruptedException ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500, ex.Message);
-            }
-
-            return await tcs.Task;
-        }
-        */
         #endregion
     }
 }

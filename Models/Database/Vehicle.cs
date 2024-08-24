@@ -2,7 +2,7 @@
 
 namespace MotorcycleRental.Models.Database
 {
-    public class Motorcycle : ModelBase
+    public class Vehicle : ModelBase
     {
         [Required]
         public string? VIN { get; set; }

@@ -11,7 +11,7 @@ namespace MotorcycleRental.Data
         #region DBSets
         public DbSet<Delivery>? Delivery { get; set; }
         public DbSet<DeliveryPerson>? DeliveryPerson { get; set; }
-        public DbSet<Motorcycle>? Motorcycle { get; set; }
+        public DbSet<Vehicle>? Vehicle { get; set; }
         public DbSet<Order>? Order { get; set; }
         public DbSet<OrderItem>? OrderItem { get; set; }
         public DbSet<Rental>? Rental { get; set; }
@@ -48,14 +48,14 @@ namespace MotorcycleRental.Data
         {
             SetupCNHTypes(modelBuilder);
             SetupRentalPlans(modelBuilder);
+            SetupRentals(modelBuilder);
             SetupDeliveryPerson(modelBuilder);
             SetupUser(modelBuilder, SetupUserType(modelBuilder));
-            SetupMotorcycle(modelBuilder);
+            SetupVehicle(modelBuilder);
+            SetupDelivery(modelBuilder);
 
-            SetupDefaultFields<Delivery>(modelBuilder);
             SetupDefaultFields<Order>(modelBuilder);
             SetupDefaultFields<OrderItem>(modelBuilder);
-            SetupDefaultFields<Rental>(modelBuilder);
             SetupDefaultFields<Notification>(modelBuilder);
         }
 
@@ -115,6 +115,29 @@ namespace MotorcycleRental.Data
             b.HasData(RentalPlans);
         }
 
+        private void SetupRentals(ModelBuilder modelBuilder)
+        {
+            SetupDefaultFields<Rental>(modelBuilder);
+            var b = modelBuilder.Entity<Rental>();
+            b.Property(p => p.StartDate).IsRequired();
+            b.Property(p => p.EndDate).IsRequired();
+
+            b.HasOne(r => r.User)
+             .WithMany(u => u.Rentals)
+             .HasForeignKey(dp => dp.UserId)
+             .IsRequired();
+            
+            b.HasOne(r => r.Vehicle)
+             .WithMany(v => v.Rentals)
+             .HasForeignKey(r => r.VehicleId)
+             .IsRequired();
+
+            b.HasOne(r => r.RentalPlan)
+             .WithMany(v => v.Rentals)
+             .HasForeignKey(r => r.RentalPlanId)
+             .IsRequired();
+        }
+
         private void SetupCNHTypes(ModelBuilder modelBuilder)
         {
             var CNHTypes = new List<CNHType>
@@ -153,17 +176,34 @@ namespace MotorcycleRental.Data
             b.HasIndex(p => p.CNH).IsUnique();
             b.Property(p => p.CNPJ).IsRequired();
             b.Property(p => p.CNH).IsRequired();
-            b.HasOne(dp => dp.CNHType).WithMany(cnh => cnh.DeliveryPersons)
-                                      .HasForeignKey(dp => dp.CNHTypeId)
-                                      .IsRequired();
-            b.HasOne(dp => dp.User).WithMany(usr => usr.DeliveryPerson)
-                                   .HasForeignKey(dp => dp.UserId);
+
+            b.HasOne(dp => dp.CNHType)
+             .WithMany(cnh => cnh.DeliveryPersons)
+             .HasForeignKey(dp => dp.CNHTypeId)
+             .IsRequired();
+
+            b.HasOne(dp => dp.User)
+             .WithOne(u => u.DeliveryPerson)
+             .HasForeignKey<User>(u => u.DeliveryPersonId)
+             .OnDelete(DeleteBehavior.SetNull);
         }
 
-        private void SetupMotorcycle(ModelBuilder modelBuilder)
+        private void SetupDelivery(ModelBuilder modelBuilder)
         {
-            SetupDefaultFields<Motorcycle>(modelBuilder);
-            var b = modelBuilder.Entity<Motorcycle>();
+            SetupDefaultFields<Delivery>(modelBuilder);
+            var b = modelBuilder.Entity<Delivery>();
+            b.Property(p => p.PickupDate).IsRequired();
+
+            b.HasOne(dp => dp.DeliveryPerson)
+             .WithMany(cnh => cnh.Deliveries)
+             .HasForeignKey(dp => dp.DeliveryPersonId)
+             .IsRequired();
+        }
+
+        private void SetupVehicle(ModelBuilder modelBuilder)
+        {
+            SetupDefaultFields<Vehicle>(modelBuilder);
+            var b = modelBuilder.Entity<Vehicle>();
             b.HasIndex(p => p.VIN).IsUnique();
             b.Property(p => p.VIN).IsRequired();
             b.Property(p => p.Model).IsRequired();
@@ -202,12 +242,26 @@ namespace MotorcycleRental.Data
             SetupDefaultFields<User>(modelBuilder);
 
             var b = modelBuilder.Entity<User>();
-            b.Property(s => s.Name).HasMaxLength(200).IsRequired();
-            b.Property(s => s.Email).HasMaxLength(100).IsRequired();
+            b.Property(s => s.Name)
+             .HasMaxLength(200)
+             .IsRequired();
+            b.Property(s => s.Email)
+             .HasMaxLength(100)
+             .IsRequired();
+            
+            b.Property(s => s.BirthDate).IsRequired();
             b.Property(s => s.Password).HasMaxLength(200).IsRequired();
             b.Property(s => s.Enabled).HasDefaultValue(true);
-            b.HasOne(u => u.UserType).WithMany(ut => ut.Users)
-                                     .HasForeignKey(u => u.UserTypeId);
+
+            b.HasOne(u => u.UserType)
+             .WithMany(ut => ut.Users)
+             .HasForeignKey(u => u.UserTypeId);
+
+            b.HasOne(u => u.DeliveryPerson)
+             .WithOne(dp => dp.User)
+             .HasForeignKey<DeliveryPerson>(dp => dp.UserId)
+             .OnDelete(DeleteBehavior.SetNull);
+
             b.HasData(new User
             {
                 Id = Guid.NewGuid(),

@@ -10,13 +10,16 @@ namespace MotorcycleRental.Models.Database
         public string? Email { get; set; }
         [Required]
         public DateTime BirthDate { get; set; }
-
+        [Required]
         public string? Password { get; set; }
         public bool? Enabled { get; set; }
 
         public Guid UserTypeId { get; set; }
         public virtual UserType? UserType { get; set; }
 
-        public ICollection<DeliveryPerson>? DeliveryPerson { get; set; }
+        public Guid? DeliveryPersonId { get; set; }
+        public virtual DeliveryPerson? DeliveryPerson { get; set; }
+
+        public ICollection<Rental>? Rentals { get; set; }
     }
 }

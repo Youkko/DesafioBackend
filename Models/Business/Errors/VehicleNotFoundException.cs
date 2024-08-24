@@ -3,7 +3,7 @@
     [Serializable]
     public class VehicleNotFoundException : Exception
     {
-        private static readonly string DefaultMessage = "There's no motorcycle with that VIN in system!";
+        private static readonly string DefaultMessage = "There's no vehicle with that VIN in system!";
 
         public VehicleNotFoundException() : base(DefaultMessage) { }
 

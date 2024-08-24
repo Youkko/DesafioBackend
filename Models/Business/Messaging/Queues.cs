@@ -15,6 +15,9 @@ namespace MotorcycleRental.Models
         public static string MRS_IN => "MotorcycleIn";
         public static string MRS_OUT => "MotorcycleOut";
 
+        public static string OMS_IN => "OrderManagementIn";
+        public static string OMS_OUT => "OrderManagementOut";
+
         public static List<KeyValuePair<string, string>> All => typeof(Queues)
             .GetProperties(BindingFlags.Public | BindingFlags.Static)
             .Where(p => p.PropertyType == typeof(string))

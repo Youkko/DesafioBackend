@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MotorcycleRental.Models.Errors;
 using DB = MotorcycleRental.Models.Database;
 using DTO = MotorcycleRental.Models.DTO;
@@ -6,16 +7,23 @@ namespace MotorcycleRental.Data
 {
     public class EFConnector : IDisposable, IConnector
     {
+        #region Object Instances
         private readonly DatabaseContext _context;
+        private readonly IMapper _mapper;
+        #endregion
 
-        public EFConnector(DatabaseContext context)
+        #region Constructor
+        public EFConnector(DatabaseContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
+        #endregion
 
+        #region Private DBSets
         private DbSet<DB.Delivery>? Deliveries => _context.Delivery;
         private DbSet<DB.DeliveryPerson>? DeliveryPeople => _context.DeliveryPerson;
-        private DbSet<DB.Motorcycle>? Motorcycles => _context.Motorcycle;
+        private DbSet<DB.Vehicle>? Vehicles => _context.Vehicle;
         private DbSet<DB.Order>? Orders => _context.Order;
         private DbSet<DB.OrderItem>? OrderItems => _context.OrderItem;
         private DbSet<DB.Rental>? Rentals => _context.Rental;
@@ -24,7 +32,9 @@ namespace MotorcycleRental.Data
         private DbSet<DB.UserType>? UserTypes => _context.UserType;
         private DbSet<DB.CNHType>? CNHTypes => _context.CNHType;
         private DbSet<DB.Notification>? Notifications => _context.Notification;
+        #endregion
 
+        #region Default database operations
         public void Migrate() => _context.Database.Migrate();
 
         public async Task<T> AddAsync<T>(T entity) where T : class
@@ -64,15 +74,32 @@ namespace MotorcycleRental.Data
             return true;
         }
 
-        public async Task<DB.Motorcycle> GetMotorcycleAsync(Guid id) =>
-            await Motorcycles!.FirstOrDefaultAsync(m => m.Id == id)??new();
+        public async Task<DB.Vehicle> GetVehicleAsync(Guid id) =>
+            await Vehicles!.FirstOrDefaultAsync(m => m.Id == id)??new();
 
-        public async Task<IEnumerable<DB.Motorcycle>> GetAllMotorcyclesAsync() =>
-            await Motorcycles!.ToListAsync();
+        public async Task<IEnumerable<DB.Vehicle>> GetAllVehiclesAsync() =>
+            await Vehicles!.ToListAsync();
 
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
+        }
+        #endregion
+
+        #region Interfaced methods
+        /// <summary>
+        /// Get user data
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>User object or null</returns>
+        public DTO.User? GetUser(Guid userId)
+        {
+            var user = Users!.Include(u => u.UserType)
+                             .Include(u => u.DeliveryPerson)
+                                 .ThenInclude(dp => dp.CNHType)
+                             .Include(u => u.Rentals)
+                             .FirstOrDefault(u => u.Id == userId);
+            return _mapper.Map<DTO.User>(user);
         }
 
         /// <summary>
@@ -93,11 +120,15 @@ namespace MotorcycleRental.Data
             var user = users.FirstOrDefault(u => !string.IsNullOrEmpty(u.Email) &&
                                                  !string.IsNullOrEmpty(userLogin.Email) &&
                                                  u.Email.ToLower() == userLogin.Email.ToLower());
+            if (user == null)
+                return null;
+
+            var userType = UserTypes!.FirstOrDefault(ut => ut.Id == user.UserTypeId);
+            var deliveryPerson = DeliveryPeople!.FirstOrDefault(dp => dp.Id == user.DeliveryPersonId);
+
             return
-                user != null ?
-                    PasswordHelper.VerifyPassword(userLogin.Password!, user.Password!) ?
-                    new Models.DTO.User(user) :
-                    null : 
+                PasswordHelper.VerifyPassword(userLogin.Password!, user.Password!) ?
+                new DTO.User(user, deliveryPerson, userType) :
                 null;
         }
 
@@ -105,35 +136,24 @@ namespace MotorcycleRental.Data
         /// List all existing vehicles in the system
         /// </summary>
         /// <returns>IEnumerable with results || null</returns>
-        public async Task<IEnumerable<DTO.Motorcycle>?> ListVehicles()
+        public IEnumerable<DTO.Vehicle>? ListVehicles()
         {
-            var allVehicles = await GetAllAsync<DB.Motorcycle>();
-            IEnumerable<DTO.Motorcycle>? results = null;
-            if (allVehicles != null)
-            {
-                List<DTO.Motorcycle> result = new List<DTO.Motorcycle>();
-                foreach (var vehicle in allVehicles)
-                {
-                    var moto = new DTO.Motorcycle(vehicle);
-                    result.Add(moto);
-                }
-                results = result;
-            }
-            return results;
+            var allVehicles = Vehicles!.Include(v => v.Rentals);
+            return _mapper.Map<IEnumerable<DTO.Vehicle>>(allVehicles);
         }
 
         /// <summary>
         /// Find an existing vehicle in the system by its VIN
         /// </summary>
         /// <param name="data">VIN number (exact match, case-insensitive).</param>
-        /// <returns>Motorcycle object || null</returns>
-        public async Task<DTO.Motorcycle?> FindVehicleByVIN(DTO.SearchVehicleParams data)
+        /// <returns>Vehicle object || null</returns>
+        public async Task<DTO.Vehicle?> FindVehicleByVIN(DTO.SearchVehicleParams data)
         {
-            var vehicle = await Motorcycles!
+            var vehicle = await Vehicles!
                 .FirstOrDefaultAsync(m => m.VIN != null &&
                                           m.VIN.ToLower() == data.VIN!.ToLower());
             
-            return vehicle != null ? new DTO.Motorcycle(vehicle) : null;
+            return _mapper.Map<DTO.Vehicle>(vehicle);
         }
 
         /// <summary>
@@ -143,7 +163,7 @@ namespace MotorcycleRental.Data
         /// <returns>Boolean wether edition was successful</returns>
         public async Task<bool> ReplaceVIN(DTO.EditVehicleParams data)
         {
-            var vehicle = await Motorcycles!
+            var vehicle = await Vehicles!
                 .Where(m => !string.IsNullOrEmpty(m.VIN) &&
                             !string.IsNullOrEmpty(data.ExistingVIN) &&
                             m.VIN.ToLower() == data.ExistingVIN.ToLower())
@@ -162,10 +182,10 @@ namespace MotorcycleRental.Data
         /// Create a new vehicle in system.
         /// </summary>
         /// <param name="data">Vehicle details</param>
-        /// <returns>Motorcycle object || null</returns>
-        public async Task<DTO.Motorcycle?> CreateVehicle(DTO.CreateVehicleParams data)
+        /// <returns>Vehicle object || null</returns>
+        public async Task<DTO.Vehicle?> CreateVehicle(DTO.CreateVehicleParams data)
         {
-            var newVehicle = await Motorcycles!.AddAsync(new()
+            var newVehicle = await Vehicles!.AddAsync(new()
             {
                 Brand = data.Brand,
                 Model = data.Model,
@@ -173,9 +193,9 @@ namespace MotorcycleRental.Data
                 Year = data.Year,
             });
 
-            var results = await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            return await FindVehicleByVIN(new() { VIN = data.VIN });
+            return _mapper.Map<DTO.Vehicle?>(await FindVehicleByVIN(new() { VIN = data.VIN }));
         }
 
         /// <summary>
@@ -186,7 +206,7 @@ namespace MotorcycleRental.Data
         /// <exception cref="VehicleHasRentalsException"></exception>
         public async Task<bool> DeleteVehicle(DTO.DeleteVehicleParams data)
         {
-            var vehicle = await Motorcycles!
+            var vehicle = await Vehicles!
                 .Where(m => !string.IsNullOrEmpty(m.VIN) &&
                             !string.IsNullOrEmpty(data.VIN) &&
                             m.VIN.ToLower() == data.VIN.ToLower())
@@ -197,7 +217,7 @@ namespace MotorcycleRental.Data
                 if ((vehicle.Rentals != null && vehicle.Rentals.Count == 0) ||
                     vehicle.Rentals == null)
                 {
-                    Motorcycles!.Remove(vehicle);
+                    Vehicles!.Remove(vehicle);
                     await _context.SaveChangesAsync();
                     return true;
                 }
@@ -262,14 +282,90 @@ namespace MotorcycleRental.Data
 
             var delivery = resultDlv.Entity;
 
+            user.DeliveryPersonId = delivery.Id;
+
             _context.SaveChanges();
 
             return new(user, delivery, cnhType);
+        }
+
+        /// <summary>
+        /// List all existing rental plans
+        /// </summary>
+        /// <returns>List of RentalPlan objects</returns>
+        public IEnumerable<DTO.RentalPlan> ListRentalPlans() =>
+            RentalPlans!.OrderBy(p => p.Days)
+                        .Select(p => _mapper.Map<DTO.RentalPlan>(p))
+                        .AsEnumerable();
+
+        /// <summary>
+        /// Hire a vehicle.
+        /// </summary>
+        /// <param name="data">Rental details</param>
+        /// <returns>Rental data</returns>
+        public async Task<DTO.Rental> HireVehicle(DTO.RentalParams data)
+        {
+            var user = Users!.Where(u => u.Id.Equals(data.UserId)).FirstOrDefault();
+            if (user == null)
+                throw new UserNotFoundException();
+
+            var vehicle = await Vehicles!
+                .FirstOrDefaultAsync(m => m.VIN != null &&
+                                          m.VIN.ToLower() == data.VIN!.ToLower());
+            if (vehicle == null)
+                throw new VehicleNotFoundException();
+
+            if (vehicle.Rentals != null && vehicle.Rentals.Any(r => !r.ReturnDate.HasValue))
+                throw new VehicleUnavailableException();
+
+            var plan = RentalPlans!.Where(rp => rp.Days == data.PlanDays).FirstOrDefault();
+            if (plan == null)
+                throw new InvalidPlanException();
+
+            var startDate = DateTime.Now.AddDays(1);
+            var endDate = startDate.AddDays(plan.Days);
+
+            var resultRnt = await Rentals!.AddAsync(new()
+            {
+                UserId = user.Id,
+                VehicleId = vehicle.Id,
+                RentalPlanId = plan.Id,
+                StartDate = startDate.ToUniversalTime(),
+                EndDate = endDate.ToUniversalTime(),
+                ReturnDate = null,
+            });
+
+            _context.SaveChanges();
+
+            return _mapper.Map<DTO.Rental>(resultRnt.Entity);
+        }
+
+        /// <summary>
+        /// List user's rentals
+        /// </summary>
+        /// <param name="data">User Id</param>
+        /// <returns>Rental data</returns>
+        public ICollection<DTO.RentalInfo> ListUserRentals(Guid userId)
+        {
+            var user = GetUser(userId);
+            if (user == null)
+                throw new UserNotFoundException();
+
+            var rentals = Users!.Include(u => u.Rentals!)
+                                .ThenInclude(r => r.Vehicle!)
+                                .Include(u => u.Rentals!)
+                                .ThenInclude(r => r.RentalPlan)
+                                .FirstOrDefault(u => u.Id == userId)?
+                                .Rentals;
+
+            var data = _mapper.Map<ICollection<DTO.RentalInfo>>(rentals);
+            return data;
         }
 
         public void Dispose()
         {
             _context?.Dispose();
         }
+        #endregion
     }
 }

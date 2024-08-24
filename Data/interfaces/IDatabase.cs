@@ -6,6 +6,12 @@ namespace MotorcycleRental.Data
     {
         void Migrate();
         /// <summary>
+        /// Get user data
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>User object or null</returns>
+        User? GetUser(Guid userId);
+        /// <summary>
         /// Authenticate an user
         /// </summary>
         /// <param name="userLogin">Login data for authentication (email and password)</param>
@@ -16,13 +22,13 @@ namespace MotorcycleRental.Data
         /// List all existing vehicles in the system
         /// </summary>
         /// <returns>IEnumerable with results || null</returns>
-        Task<IEnumerable<Motorcycle>?> ListVehicles();
+        IEnumerable<Vehicle>? ListVehicles();
         /// <summary>
         /// Find an existing vehicle in the system by it's VIN
         /// </summary>
         /// <param name="data">VIN number (exact match, case-insensitive).</param>
-        /// <returns>Motorcycle object || null</returns>
-        Task<Motorcycle?> FindVehicleByVIN(SearchVehicleParams data);
+        /// <returns>Vehicle object || null</returns>
+        Task<Vehicle?> FindVehicleByVIN(SearchVehicleParams data);
         /// <summary>
         /// Replace VIN information for an existing vehicle
         /// </summary>
@@ -33,8 +39,8 @@ namespace MotorcycleRental.Data
         /// Create a new vehicle in system.
         /// </summary>
         /// <param name="data">Vehicle details</param>
-        /// <returns>Motorcycle object || null</returns>
-        Task<Motorcycle?> CreateVehicle(CreateVehicleParams data);
+        /// <returns>Vehicle object || null</returns>
+        Task<Vehicle?> CreateVehicle(CreateVehicleParams data);
         /// <summary>
         /// Delete an existing vehicle by it's VIN information IF it has no rentals
         /// </summary>
@@ -56,5 +62,25 @@ namespace MotorcycleRental.Data
         /// <exception cref="ExistingCNPJException"></exception>
         /// <exception cref="InvalidCNHTypeException"></exception>
         Task<CreatedUser> CreateUser(CreateUserParams data);
+
+        /// <summary>
+        /// List all existing rental plans
+        /// </summary>
+        /// <returns>List of RentalPlan objects</returns>
+        IEnumerable<RentalPlan> ListRentalPlans();
+
+        /// <summary>
+        /// Hire a vehicle.
+        /// </summary>
+        /// <param name="data">Rental details</param>
+        /// <returns>Rental data</returns>
+        Task<Rental> HireVehicle(RentalParams data);
+
+        /// <summary>
+        /// List user's rentals
+        /// </summary>
+        /// <param name="data">User Id</param>
+        /// <returns>Rental data</returns>
+        ICollection<RentalInfo> ListUserRentals(Guid userId);
     }
 }

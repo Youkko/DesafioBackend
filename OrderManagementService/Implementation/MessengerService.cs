@@ -1,29 +1,37 @@
 ﻿using Microsoft.Extensions.Options;
 using MotorcycleRental.Data;
 using MotorcycleRental.Models;
+using MotorcycleRental.Models.DTO;
 using MotorcycleRental.Models.Errors;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
+using JS = System.Text.Json;
 namespace OrderManagementService
 {
     public class MessengerService : IHostedService
     {
         #region Object Instances
         private readonly ILogger<MessengerService> _logger;
+        private readonly IOrderOps _orders;
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly RabbitMQSettings _settings;
+        private readonly Dictionary<string, Func<ReadOnlyMemory<byte>, string>>
+            actionMap;
         #endregion
 
         #region Constructor
         public MessengerService(
             IOptions<RabbitMQSettings> options,
             ILogger<MessengerService> logger,
+            IOrderOps orders,
             IDatabase database)
         {
             _logger = logger;
             _settings = options.Value;
+            _orders = orders;
             _connection = new ConnectionFactory()
             {
                 HostName = _settings.HostName,
@@ -33,10 +41,95 @@ namespace OrderManagementService
 
             _channel = _connection.CreateModel();
             DeclareQueues();
+            actionMap = new()
+            {
+                { Commands.LISTRENTALS, ListRentals },
+                { Commands.LISTPLANS, ListPlans },
+                { Commands.HIREVEHICLE, HireVehicle },
+                { Commands.RETURNVEHICLE, ReturnVehicle },
+            };
         }
         #endregion
 
         #region Private methods
+
+        #region -> Action methods
+        private string ListRentals(ReadOnlyMemory<byte> body)
+        {
+            Response? response = null;
+            try
+            {
+                response = _orders.ListUserRentals(Encoding.UTF8.GetString(body.ToArray())).Result;
+            }
+            catch (Exception ex)
+            {
+                response = new(ex.Message, false);
+                _logger.LogError(ex, ex.Message);
+                return JS.JsonSerializer.Serialize(response);
+            }
+            return JS.JsonSerializer.Serialize(response);
+        }
+
+        private string ListPlans(ReadOnlyMemory<byte> body)
+        {
+            Response? response = null;
+            try
+            {
+                response = _orders.ListPlans();
+            }
+            catch (Exception ex)
+            {
+                response = new(ex.Message, false);
+                _logger.LogError(ex, ex.Message);
+                return JS.JsonSerializer.Serialize(response);
+            }
+            return JS.JsonSerializer.Serialize(response);
+        }
+
+        private string HireVehicle(ReadOnlyMemory<byte> body)
+        {
+            try
+            {
+                var data = DeserializeMessage<RentalParams>(body.ToArray());
+                var result = _orders.HireVehicle(data!).Result;
+                return JS.JsonSerializer.Serialize(result);
+            }
+            catch (AggregateException aEx)
+            {
+                Response response = new(string.Empty, false);
+                aEx.Flatten().Handle(ex =>
+                {
+                    response.Message = ex.Message;
+                    _logger.LogError(ex, ex.Message);
+                    return true;
+                });
+                return JS.JsonSerializer.Serialize(response);
+            }
+        }
+
+        private string ReturnVehicle(ReadOnlyMemory<byte> body)
+        {
+            try
+            {
+                var data = DeserializeMessage<ReturnParams>(body.ToArray());
+                var response = _orders.PreviewVehicleReturn(data!).Result;
+                return JS.JsonSerializer.Serialize(response);
+            }
+            catch (AggregateException aEx)
+            {
+                Response response = new(string.Empty, false);
+                aEx.Flatten().Handle(ex =>
+                {
+                    response.Message = ex.Message;
+                    _logger.LogError(ex, ex.Message);
+                    return true;
+                });
+                return JS.JsonSerializer.Serialize(response);
+            }
+        }
+        #endregion
+
+        #region -> Messaging system
         private void DeclareQueues()
         {
             foreach (
@@ -53,27 +146,68 @@ namespace OrderManagementService
             }
         }
 
-        private void OnMessageReceived(object? sender, BasicDeliverEventArgs e)
+        private void PublishMessage(string message, BasicDeliverEventArgs e)
         {
-            var body = e.Body;
-            string? message = Encoding.UTF8.GetString(body.ToArray());
-            //var loginRequest = JsonConvert.DeserializeObject<UserLogin>(message);
-            //var result = _auth.AuthenticateAsync(loginRequest!);
-            try
+            byte[] msg = Encoding.UTF8.GetBytes(message);
+            _channel.BasicPublish(
+                string.Empty,
+                e.BasicProperties.ReplyTo,
+                e.BasicProperties,
+                msg
+            );
+        }
+
+        private string GetRequest(BasicDeliverEventArgs args)
+        {
+            string request = string.Empty;
+            var props = args.BasicProperties;
+            if (props.Headers != null &&
+                props.Headers.TryGetValue("request", out var operationBytes))
             {
-                //_channel.BasicPublish(
-                //    string.Empty,
-                //    Queues.AUTHOUT,
-                //null,
-                //    Encoding.UTF8.GetBytes(
-                //        System.Text.Json.JsonSerializer.Serialize(result.Result)));
+                request = Encoding.UTF8.GetString((byte[])operationBytes);
             }
-            catch (RabbitMQOperationInterruptedException ex)
+            return request;
+        }
+
+        private T? DeserializeMessage<T>(byte[] bMessage, bool required = true)
+        {
+            var response = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bMessage));
+            if (required && response == null)
+                throw new RequiredInformationMissingException();
+            return response;
+        }
+
+        private void OnMessageReceived(object? sender, BasicDeliverEventArgs e) =>
+            RedirectToMap(actionMap, e);
+
+        private void RedirectToMap(
+            Dictionary<string, Func<ReadOnlyMemory<byte>, string>> map,
+            BasicDeliverEventArgs e)
+        {
+            string request = GetRequest(e);
+            if (!string.IsNullOrEmpty(request))
             {
-                _logger.LogError(ex, ex.Message);
-                throw;
+                try
+                {
+                    if (map.TryGetValue(request, out var action))
+                    {
+                        string response = action(e.Body);
+                        PublishMessage(response, e);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Unknown request: {Request}", request);
+                    }
+                }
+                catch (RabbitMQOperationInterruptedException ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    throw;
+                }
             }
         }
+        #endregion
+
         #endregion
 
         #region Public methods
@@ -83,11 +217,13 @@ namespace OrderManagementService
             {
                 _logger.LogInformation("Consumer started at: {time}", DateTimeOffset.Now);
             }
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += OnMessageReceived;
-            //_channel.BasicConsume(queue: Queues.AUTHIN,
-            //                      autoAck: true,
-            //                      consumer: consumer);
+            var inConsumer = new EventingBasicConsumer(_channel);
+
+            inConsumer.Received += OnMessageReceived;
+
+            _channel.BasicConsume(queue: Queues.OMS_IN,
+                                    autoAck: true,
+                                    consumer: inConsumer);
             return Task.CompletedTask;
         }
 

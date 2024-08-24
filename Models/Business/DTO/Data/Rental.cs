@@ -2,20 +2,24 @@
 {
     public class Rental : ModelBase
     {
-        public Guid MotorcycleId { get; set; }
+        public Guid UserId { get; set; }
+        public Guid VehicleId { get; set; }
+        public Guid RentalPlanId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public string? RentalStatus { get; set; }
+        public DateTime? ReturnDate { get; set; }
 
         public Rental() { }
 
         public Rental(Database.Rental rental)
         {
             Id = rental.Id;
-            MotorcycleId = rental.MotorcycleId;
+            UserId = rental.UserId;
+            VehicleId = rental.VehicleId;
+            RentalPlanId = rental.RentalPlanId;
             StartDate = rental.StartDate;
             EndDate = rental.EndDate;
-            RentalStatus = rental.RentalStatus;
+            ReturnDate = rental.ReturnDate;
             CreatedOn = rental.CreatedOn;
             ModifiedOn = rental.ModifiedOn;
         }

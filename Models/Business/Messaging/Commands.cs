@@ -11,7 +11,11 @@ namespace MotorcycleRental.Models
         public static string NOTIFY => "notify";
         public static string CREATEUSER => "createuser";
         public static string UPLOADCNHIMAGE => "uploadcnhimg";
-
+        public static string LISTPLANS => "listplans";
+        public static string HIREVEHICLE => "hirevehicle";
+        public static string RETURNVEHICLE => "returnvehicle";
+        public static string LISTRENTALS => "listuserrentals";
+        
         public static List<KeyValuePair<string, string>> All => typeof(Commands)
             .GetProperties(BindingFlags.Public | BindingFlags.Static)
             .Where(p => p.PropertyType == typeof(string))

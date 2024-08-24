@@ -3,7 +3,7 @@ using MotorcycleRental.Models.DTO;
 using MotorcycleRental.Models.Errors;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-namespace DeliveryPersonService
+namespace MotorcycleService
 {
     public class VehicleOps : IVehicleOps
     {
@@ -42,12 +42,12 @@ namespace DeliveryPersonService
         /// </summary>
         /// <param name="data">Optional. Filter by VIN number (full or partial, case-insensitive).</param>
         /// <returns>APIResponse object with success status and any relevant data</returns>
-        public async Task<Response> ListVehicles(SearchVehicleParams data)
+        public Response ListVehicles(SearchVehicleParams data)
         {
             Response response = new(null, true);
             try
             {
-                var vehicles = await _database.ListVehicles();
+                var vehicles = _database.ListVehicles();
                 if (vehicles == null)
                     return response;
 

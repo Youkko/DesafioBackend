@@ -1,12 +1,26 @@
-﻿namespace MotorcycleRental.Models.Database
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MotorcycleRental.Models.Database
 {
     public class Rental : ModelBase
     {
-        public Guid MotorcycleId { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public string? RentalStatus { get; set; }
+        [Required]
+        public Guid UserId { get; set; }
+        public virtual User? User { get; set; }
 
-        public virtual Motorcycle? Motorcycle { get; set; }
+        [Required]
+        public Guid VehicleId { get; set; }
+        public virtual Vehicle? Vehicle { get; set; }
+
+        [Required]
+        public Guid RentalPlanId { get; set; }
+        public virtual RentalPlan? RentalPlan { get; set; }
+
+        [Required]
+        public DateTime StartDate { get; set; }
+        [Required]
+        public DateTime EndDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
+
     }
 }

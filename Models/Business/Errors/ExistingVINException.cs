@@ -3,7 +3,7 @@
     [Serializable]
     public class ExistingVINException : Exception
     {
-        private static readonly string DefaultMessage = "A motorcycle with that VIN already exists in system!";
+        private static readonly string DefaultMessage = "A vehicle with that VIN already exists in system!";
 
         public ExistingVINException() : base(DefaultMessage) { }
 

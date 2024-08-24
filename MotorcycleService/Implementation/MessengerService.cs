@@ -1,5 +1,4 @@
-﻿using DeliveryPersonService;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using MotorcycleRental.Data;
 using MotorcycleRental.Models;
 using MotorcycleRental.Models.DTO;
@@ -45,13 +44,13 @@ namespace MotorcycleService
             DeclareQueues();
             mgmtActionMap = new()
             {
-                { Commands.CREATEVEHICLE, CreateMotorcycle },
+                { Commands.CREATEVEHICLE, CreateVehicle },
                 { Commands.EDITVIN, EditVIN },
-                { Commands.DELETEVEHICLE, DeleteMotorcycle },
+                { Commands.DELETEVEHICLE, DeleteVehicle },
             };
             actionMap = new()
             {
-                { Commands.LISTVEHICLES, ListMotorcycles },
+                { Commands.LISTVEHICLES, ListVehicles },
                 { Commands.NOTIFY, Notify },
             };
         }
@@ -60,7 +59,7 @@ namespace MotorcycleService
         #region Private methods
 
         #region -> Action methods
-        private string CreateMotorcycle(ReadOnlyMemory<byte> body)
+        private string CreateVehicle(ReadOnlyMemory<byte> body)
         {
             Response? response = null;
             try
@@ -82,7 +81,7 @@ namespace MotorcycleService
 
             if (response != null && response.Success)
             {
-                Motorcycle? result = JsonConvert.DeserializeObject<Motorcycle>(response.Message!.ToString()!);
+                Vehicle? result = JsonConvert.DeserializeObject<Vehicle>(response.Message!.ToString()!);
                 if (result != null && result.Year == 2024)
                 {
                     try
@@ -145,7 +144,7 @@ namespace MotorcycleService
             }
         }
 
-        private string DeleteMotorcycle(ReadOnlyMemory<byte> body)
+        private string DeleteVehicle(ReadOnlyMemory<byte> body)
         {
             try
             {
@@ -166,12 +165,12 @@ namespace MotorcycleService
             }
         }
 
-        private string ListMotorcycles(ReadOnlyMemory<byte> body)
+        private string ListVehicles(ReadOnlyMemory<byte> body)
         {
             try
             {
                 var data = DeserializeMessage<SearchVehicleParams>(body.ToArray());
-                var vehicles = _vehicles.ListVehicles(data!).Result;
+                var vehicles = _vehicles.ListVehicles(data!);
                 return JS.JsonSerializer.Serialize(vehicles);
             }
             catch (AggregateException aEx)

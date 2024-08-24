@@ -11,9 +11,15 @@ namespace MotorcycleRental.Data
         Task<IEnumerable<T>> GetAllAsync<T>() where T : class;
         Task<T> UpdateAsync<T>(T entity) where T : class;
         Task<bool> DeleteAsync<T>(Guid id) where T : class;
-        Task<DB.Motorcycle> GetMotorcycleAsync(Guid id);
-        Task<IEnumerable<DB.Motorcycle>> GetAllMotorcyclesAsync();
+        Task<DB.Vehicle> GetVehicleAsync(Guid id);
+        Task<IEnumerable<DB.Vehicle>> GetAllVehiclesAsync();
         Task<int> SaveChangesAsync();
+        /// <summary>
+        /// Get user data
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>User object or null</returns>
+        DTO.User? GetUser(Guid userId);
         /// <summary>
         /// Authenticate an user
         /// </summary>
@@ -25,13 +31,13 @@ namespace MotorcycleRental.Data
         /// List all existing vehicles in the system
         /// </summary>
         /// <returns>IEnumerable with results || null</returns>
-        Task<IEnumerable<DTO.Motorcycle>?> ListVehicles();
+        IEnumerable<DTO.Vehicle>? ListVehicles();
         /// <summary>
         /// Find an existing vehicle in the system by it's VIN
         /// </summary>
         /// <param name="data">VIN number (exact match, case-insensitive).</param>
-        /// <returns>Motorcycle object || null</returns>
-        Task<DTO.Motorcycle?> FindVehicleByVIN(DTO.SearchVehicleParams data);
+        /// <returns>Vehicle object || null</returns>
+        Task<DTO.Vehicle?> FindVehicleByVIN(DTO.SearchVehicleParams data);
         /// <summary>
         /// Replace VIN information for an existing vehicle
         /// </summary>
@@ -42,8 +48,8 @@ namespace MotorcycleRental.Data
         /// Create a new vehicle in system.
         /// </summary>
         /// <param name="data">Vehicle details</param>
-        /// <returns>Motorcycle object || null</returns>
-        Task<DTO.Motorcycle?> CreateVehicle(DTO.CreateVehicleParams data);
+        /// <returns>Vehicle object || null</returns>
+        Task<DTO.Vehicle?> CreateVehicle(DTO.CreateVehicleParams data);
         /// <summary>
         /// Delete an existing vehicle by it's VIN information IF it has no rentals
         /// </summary>
@@ -65,6 +71,23 @@ namespace MotorcycleRental.Data
         /// <exception cref="ExistingCNPJException"></exception>
         /// <exception cref="InvalidCNHTypeException"></exception>
         Task<DTO.CreatedUser> CreateUser(DTO.CreateUserParams data);
+        /// <summary>
+        /// List all existing rental plans
+        /// </summary>
+        /// <returns>List of RentalPlan objects</returns>
+        IEnumerable<DTO.RentalPlan> ListRentalPlans();
+        /// <summary>
+        /// Hire a vehicle.
+        /// </summary>
+        /// <param name="data">Rental details</param>
+        /// <returns>Rental data</returns>
+        Task<DTO.Rental> HireVehicle(DTO.RentalParams data);
+        /// <summary>
+        /// List user's rentals
+        /// </summary>
+        /// <param name="data">User Id</param>
+        /// <returns>Rental data</returns>
+        ICollection<DTO.RentalInfo> ListUserRentals(Guid userId);
         void Dispose();
     }
 }

@@ -12,12 +12,9 @@ namespace MotorcycleRental.Models.Database
 
         [Required]
         public Guid CNHTypeId { get; set; }
-        
-        [Required]
-        public Guid UserId { get; set; }
-
         public virtual CNHType? CNHType { get; set; }
-
+        
+        public Guid? UserId { get; set; }
         public virtual User? User { get; set; }
 
         public ICollection<Delivery>? Deliveries { get; set; }

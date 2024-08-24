@@ -1,6 +1,6 @@
 ﻿using MotorcycleRental.Models.DTO;
 using MotorcycleRental.Models.Errors;
-namespace DeliveryPersonService
+namespace MotorcycleService
 {
     public interface IVehicleOps
     {
@@ -9,7 +9,7 @@ namespace DeliveryPersonService
         /// </summary>
         /// <param name="data">Optional. Filter by VIN number (full or partial, case-insensitive).</param>
         /// <returns>APIResponse object with success status and any relevant data</returns>
-        Task<Response> ListVehicles(SearchVehicleParams data);
+        Response ListVehicles(SearchVehicleParams data);
         /// <summary>
         /// Create a new vehicle in system.
         /// </summary>

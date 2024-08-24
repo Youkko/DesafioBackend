@@ -3,7 +3,7 @@
     [Serializable]
     public class VehicleHasRentalsException : Exception
     {
-        private static readonly string DefaultMessage = "The motorcycle you're trying to remove has rentals registered!";
+        private static readonly string DefaultMessage = "The vehicle you're trying to remove has rentals registered!";
 
         public VehicleHasRentalsException() : base(DefaultMessage) { }
 

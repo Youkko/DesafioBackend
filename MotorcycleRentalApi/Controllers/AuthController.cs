@@ -4,7 +4,6 @@ using MotorcycleRental.Models.DTO;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text.Json;
-using System.Text;
 using MotorcycleRental.Models.Errors;
 namespace MotorcycleRentalApi.Controllers
 {
@@ -43,47 +42,16 @@ namespace MotorcycleRentalApi.Controllers
             var tcs = new TaskCompletionSource<IActionResult>();
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (ModuleHandle, evtArgs) =>
-            {
-                try
-                {
-                    if (evtArgs.BasicProperties.CorrelationId == correlationID)
-                    {
-                        _channel.BasicAck(deliveryTag: evtArgs.DeliveryTag, multiple: false);
-                        string respStr = Encoding.UTF8.GetString(evtArgs.Body.ToArray());
-                        var response = JsonSerializer.Deserialize<Response>(respStr);
-                        tcs.SetResult(ProcessResponse<LoginResponse>(response));
-                    }
-                    else
-                    {
-                        _channel.BasicReject(deliveryTag: evtArgs.DeliveryTag, requeue: true);
-                    }
-                }
-                catch (RabbitMQOperationInterruptedException ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                    tcs.SetResult(StatusCode(500, ex.Message));
-                }
-            };
+                HandleConsumerAction<LoginResponse>(_logger, ref evtArgs, ref tcs);
 
-            try
-            {
-                SendMessageAndListenForResponse(
-                    JsonSerializer.Serialize(data),
-                    Commands.AUTHENTICATE,
-                    Queues.DPS_AUTHIN,
-                    Queues.DPS_AUTHOUT,
-                    ref consumer);
-            }
-            catch (RabbitMQOperationInterruptedException ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(500, ex.Message);
-            }
+            SendMessageAndListenForResponse(
+                JsonSerializer.Serialize(data),
+                Commands.AUTHENTICATE,
+                Queues.DPS_AUTHIN,
+                Queues.DPS_AUTHOUT,
+                _logger,
+                ref consumer,
+                ref tcs);
 
             return await tcs.Task;
         }

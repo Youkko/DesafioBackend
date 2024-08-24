@@ -2,21 +2,30 @@
 using Microsoft.Extensions.Options;
 using MotorcycleRental.Models.DTO;
 using MotorcycleRental.Models.Errors;
+using AutoMapper;
 namespace MotorcycleRental.Data
 {
     public class Database : IDatabase
     {
         private readonly IOptions<DatabaseConfig> _options;
+        private readonly IMapper _mapper;
         private readonly IConnector _connector;
-
-        public Database(IOptions<DatabaseConfig> options)
+        public Database(IOptions<DatabaseConfig> options, IMapper mapper)
         {
             _options = options;
+            _mapper = mapper;
             var curOptions = _options.Value;
-            _connector = new EFConnector(new DatabaseContext(curOptions.ConnectionString!));
+            _connector = new EFConnector(new DatabaseContext(curOptions.ConnectionString!), _mapper);
         }
 
         public void Migrate() => _connector.Migrate();
+
+        /// <summary>
+        /// Get user data
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>User object or null</returns>
+        public User? GetUser(Guid userId) => _connector.GetUser(userId);
 
         /// <summary>
         /// Authenticate an user
@@ -31,7 +40,7 @@ namespace MotorcycleRental.Data
         /// List all existing motorcycles in the system
         /// </summary>
         /// <returns>IEnumerable with results, or null</returns>
-        public Task<IEnumerable<Motorcycle>?> ListVehicles() => 
+        public IEnumerable<Vehicle>? ListVehicles() => 
             _connector.ListVehicles();
 
         /// <summary>
@@ -39,7 +48,7 @@ namespace MotorcycleRental.Data
         /// </summary>
         /// <param name="data">VIN number (exact match, case-insensitive).</param>
         /// <returns>Motorcycle object || null</returns>
-        public Task<Motorcycle?> FindVehicleByVIN(SearchVehicleParams data) =>
+        public Task<Vehicle?> FindVehicleByVIN(SearchVehicleParams data) =>
             _connector.FindVehicleByVIN(data);
 
         /// <summary>
@@ -55,7 +64,7 @@ namespace MotorcycleRental.Data
         /// </summary>
         /// <param name="data">Vehicle details</param>
         /// <returns>Motorcycle object || null</returns>
-        public Task<Motorcycle?> CreateVehicle(CreateVehicleParams data) =>
+        public Task<Vehicle?> CreateVehicle(CreateVehicleParams data) =>
             _connector.CreateVehicle(data);
 
         /// <summary>
@@ -84,5 +93,27 @@ namespace MotorcycleRental.Data
         public Task<CreatedUser> CreateUser(CreateUserParams data) => 
             _connector.CreateUser(data);
 
+        /// <summary>
+        /// List all existing rental plans
+        /// </summary>
+        /// <returns>List of RentalPlan objects</returns>
+        public IEnumerable<RentalPlan> ListRentalPlans() =>
+            _connector.ListRentalPlans();
+
+        /// <summary>
+        /// Hire a vehicle.
+        /// </summary>
+        /// <param name="data">Rental details</param>
+        /// <returns>Rental data</returns>
+        public Task<Rental> HireVehicle(RentalParams data) =>
+            _connector.HireVehicle(data);
+
+        /// <summary>
+        /// List user's rentals
+        /// </summary>
+        /// <param name="data">User Id</param>
+        /// <returns>Rental data</returns>
+        public ICollection<RentalInfo> ListUserRentals(Guid userId) =>
+            _connector.ListUserRentals(userId);
     }
 }
